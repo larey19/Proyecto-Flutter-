@@ -1,0 +1,1187 @@
+{
+  
+  "openapi": "3.0.0",
+  "components": {
+    "securitySchemes": {
+      "bearerAuth" : {  
+        "type" : "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security":{
+    "bearerAuth" : []
+  },
+  "info": {
+    "title": "Proyecto Flutter",
+    "description": "API para registrar, listar, y editar Barberos, Clientes, Usuarios y Servicios",
+    "version": "1.0.0"
+  },
+
+  "servers": [
+    {
+      "url": " http://127.0.0.1:4000"
+    },
+    {
+      "url": "http://10.2.125.234:4000"
+    }
+  ],
+  "tags":[
+    {
+    "name": "LogIn",
+    "description": "Siendo el primer paso para acceder a cada sesion de esta API."
+    },
+    {
+    "name": "Usuario",
+    "description": "Todo sobre la gestión de usuarios"
+    },
+    {
+    "name": "Barbero",
+    "description": "Todo sobre la gestión de Barberos"
+    },
+    {
+    "name": "Cliente",
+    "description": "Todo sobre la gestión de Clientes"
+    },
+    {
+    "name": "Servicio",
+    "description": "Todo sobre la gestión de Servicios"
+    }
+  ],
+
+  "paths": {
+    "/acceso": {
+      "post": {
+        "tags": ["LogIn"],
+        "summary": "Iniciar sesión de usuario",
+        "description": "Este endpoint permite a un usuario iniciar sesión. Retornando un token JWT el cual permitira acceder a todas las rutas de esta API.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["usu_usuario", "usu_contraseña"],
+                "properties": {
+                  "usu_usuario": { "type": "string" },
+                  "usu_contraseña": { "type": "string" }
+                },
+                "example": {
+                  "usu_usuario": "carlos123",
+                  "usu_contraseña": "1234"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" },
+                    "token": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Sesión iniciada con éxito Carlos",
+                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Para iniciar sesión debes llenar todos los campos"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ups, ese usuario parece estar incorrecto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+
+    "/obtenerUsuarios": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Usuario"],
+        "summary": "Listar todos los Usuarios",
+        "description":"Este endpoint permite obtener un listado completo de los usuarios registrados en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de usuarios.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "usu_id"        : { "type": "integer" },
+                      "usu_nombre"    : { "type": "string" },
+                      "usu_apellido"  : { "type": "string" },
+                      "usu_telefono"  : { "type": "string" },
+                      "usu_correo"    : { "type": "string" },
+                      "usu_tipo_doc"  : { "type": "string" },
+                      "usu_num_doc"   : { "type": "string" }, 
+                      "usu_usuario"   : { "type": "string" },
+                      "usu_contraseña": { "type": "string" },
+                      "usu_estado"    : { "type": "string" },
+                      "usu_genero"    : { "type": "string" }
+                    },
+                    "example": {
+                      "usu_id": 7,
+                      "usu_nombre": "Mariana",
+                      "usu_apellido": "Torres",
+                      "usu_telefono": "3114455667",
+                      "usu_correo": "marianatorres@example.com",
+                      "usu_tipo_doc": "ti",
+                      "usu_num_doc": "122334455",
+                      "usu_usuario": "marianat",
+                      "usu_contraseña": "marianapass321",
+                      "usu_estado": "activo",
+                      "usu_genero": "Femenino"
+                    }
+                  }
+                }
+              }
+            }
+          }, 
+          "404": {
+            "description": "error de usuario inexistentes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ningun registro obtenido."
+                  }
+                }
+              }
+            }
+          }   
+        }
+      }
+    },
+    "/registrarUsuario": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Usuario"],
+        "summary": "Registrar un nuevo usuario",
+        "description": "Este endpoint permite registrar un nuevo usuario en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contraseña, usu_estado y usu_genero.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contraseña', 'usu_estado', 'usu_genero'"],
+                "properties": {
+                  "usu_nombre"    : { "type": "string" },
+                  "usu_apellido"  : { "type": "string" },
+                  "usu_telefono"  : { "type": "string" },
+                  "usu_correo"    : { "type": "string" },
+                  "usu_tipo_doc"  : { "type": "string" },
+                  "usu_num_doc"   : { "type": "string" }, 
+                  "usu_usuario"   : { "type": "string" },
+                  "usu_contraseña": { "type": "string" },
+                  "usu_estado"    : { "type": "string" },
+                  "usu_genero"    : { "type": "string" }
+                },
+                "example": {
+                  "usu_nombre": "Mariana",
+                  "usu_apellido": "Torres",
+                  "usu_telefono": "3114455667",
+                  "usu_correo": "marianatorres@example.com",
+                  "usu_tipo_doc": "ti",
+                  "usu_num_doc": "122334455",
+                  "usu_usuario": "marianat",
+                  "usu_contraseña": "marianapass321",
+                  "usu_estado": "activo",
+                  "usu_genero": "Femenino"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el usuario fue registrado correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Usuario Registrado"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "error de entrada duplicada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "ya existe un registro asociado con ese correo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos en la peticion."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/editarUsuario/{usu_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Usuario"],
+        "summary": "Editar un usuario existente",
+        "description": "Este endpoint permite registrar un nuevo aprendiz en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contraseña, usu_estado y usu_genero.",
+        "parameters": [
+          {
+            "name": "usu_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contraseña', 'usu_estado', 'usu_genero'"],
+                "properties": {
+                  "usu_nombre"    : { "type": "string" },
+                  "usu_apellido"  : { "type": "string" },
+                  "usu_telefono"  : { "type": "string" },
+                  "usu_correo"    : { "type": "string" },
+                  "usu_tipo_doc"  : { "type": "string" },
+                  "usu_num_doc"   : { "type": "string" }, 
+                  "usu_usuario"   : { "type": "string" },
+                  "usu_contraseña": { "type": "string" },
+                  "usu_genero"    : { "type": "string" }
+                },
+                "example": {
+                  "usu_nombre": "Mariana",
+                  "usu_apellido": "Torres",
+                  "usu_telefono": "3114455667",
+                  "usu_correo": "marianatorres@example.com",
+                  "usu_tipo_doc": "ti",
+                  "usu_num_doc": "122334455",
+                  "usu_usuario": "marianat",
+                  "usu_contraseña": "marianapass321",
+                  "usu_genero": "Femenino"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el usuario fue actualizado correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "se ha editado el usuario"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de usuario inexistente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Parece que intentas actualizar un usario que NO existe."
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "error de entrada duplicada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "ya existe un registro asociado con ese correo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cambiarEstado/{usu_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Usuario"],
+        "summary": "Editar Estado de un usuario",
+        "description":"Este endpoint permite editar el estado de un usuario del sistema utilizando su identificador único ID.",
+        "parameters": [
+          {
+            "name": "usu_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'usu_estado'"],
+                "properties": {
+                  "usu_estado"    : { "type": "string" }
+                },
+                "example": {
+                  "usu_estado": "Inactivo"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el estado del usuario fue actualizado correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Se ha cambiado el estado del usuario"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de usuario inexistente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Parece que intentas actualizar un usario que NO existe."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    
+
+    "/obtenerBarberos": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Barbero"],
+        "summary": "Buscar barbero registrados en el sistema",
+        "description":"Este endpoint permite obtener un listado completo de los barberos registrados en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Listado de barberos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                  "bar_usu_id"    : { "type": "integer" },
+                  "usu_nombre"    : { "type": "string" },
+                  "usu_apellido"  : { "type": "string" },
+                  "usu_telefono"  : { "type": "string" },
+                  "usu_correo"    : { "type": "string" },
+                  "usu_tipo_doc"  : { "type": "string" },
+                  "usu_num_doc"   : { "type": "string" }, 
+                  "usu_usuario"   : { "type": "string" },
+                  "usu_contraseña": { "type": "string" },
+                  "usu_estado"    : { "type": "string" },
+                  "usu_genero"    : { "type": "string" },
+                  "usu_salario"   : { "type": "string" }
+                  },
+                  "example" : {
+                    "bar_salario": "1500000",
+                    "bar_usu_id": 3,
+                    "usu_apellido": "Rodríguez",
+                    "usu_contraseña": "claveAndres789",
+                    "usu_correo": "andres.rodriguez@example.com",
+                    "usu_estado": "activo",
+                    "usu_genero": "Masculino",
+                    "usu_nombre": "Andrés",
+                    "usu_num_doc": "9876543210",
+                    "usu_telefono": "3201122334",
+                    "usu_tipo_doc": "ce",
+                    "usu_usuario": "andresr"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Listado de barberos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type" : "string" }
+                  },
+                  "example" : {
+                    "mensaje": "Ningun barbero obtenido."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registrarBarbero": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Barbero"],
+        "summary": "Registar un nuevo barbero",
+        "description": "Este endpoint permite registrar un nuevo barbero en el sistema. Requiere enviar un objeto JSON con los siguentes datos como el bar_salario y el bar_usu_id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'bar_salario', 'bar_usu_id'"],
+                "properties": {
+                  "bar_salario" : { "type": "string" }, 
+                  "bar_usu_id"  : { "type": "integer" }
+                },
+                "example" : {
+                  "bar_salario": "1500000",
+                  "bar_usu_id": 3
+                } 
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el usuario fue registrado correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "properties": {
+                    "bar_salario" : { "type": "string" }, 
+                    "bar_usu_id"  : { "type": "integer" }
+                  },
+                  "example" : {
+                    "bar_salario": "1500000",
+                    "bar_usu_id": 3
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de usuario inexistente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "No existe un usuario registrado con ese ID"
+                  }
+                }
+              }
+            }
+          } ,  
+          "409": {
+            "description": "error de entrada duplicada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ya existe un Barbero registrado con ese ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+
+    "/obtenerClientes": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Cliente"],
+        "summary": "Obtener clientes registrados del sistema",
+        "description":"Este endpoint permite obtener un listado completo de los clientes registrados en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de usuarios.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                    "cli_usu_id"    : { "type": "integer" },
+                    "usu_apellido"  : { "type": "string" },
+                    "usu_contraseña": { "type": "string" },
+                    "usu_correo"    : { "type": "string" },
+                    "usu_estado"    : { "type": "string" },
+                    "usu_genero"    : { "type": "string" },
+                    "usu_nombre"    : { "type": "string" },
+                    "usu_num_doc"   : { "type": "string" },
+                    "usu_telefono"  : { "type": "string" },
+                    "usu_tipo_doc"  : { "type": "string" },
+                    "usu_usuario"   : { "type": "string" }
+                  },
+                    "example" : {
+                      "cli_usu_id": 2,
+                      "usu_apellido": "Gómez",
+                      "usu_contraseña": "securepass456",
+                      "usu_correo": "laura.gomez@example.com",
+                      "usu_estado": "activo",
+                      "usu_genero": "Femenino",
+                      "usu_nombre": "Laura",
+                      "usu_num_doc": "1098765432",
+                      "usu_telefono": "3109876543",
+                      "usu_tipo_doc": "ti",
+                      "usu_usuario": "laurag"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de clientes inexistentes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ningun cliente obtenido."
+                  }
+                }
+              }
+            }
+          }   
+        }
+      }
+    },
+    "/registrarCliente": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Cliente"],
+        "summary": "Registar un nuevo cliente",
+        "description": "Este endpoint permite registrar un nuevo cliente en el sistema. Requiere enviar un objeto JSON con el siguentes dato cli_usu_id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["cli_usu_id"],
+                "properties": {
+                  "cli_usu_id"    : { "type": "integer" }
+                },
+                "example": {
+                  "cli_usu_id": 4
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro de clientes ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "cli_usu_id" : { "type": "integer" }
+                    },
+                    "example" : {
+                      "mensaje": "Se ha resgistrado el cliente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de usuario inexistente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "No existe un usuario registrado con ese ID"
+                  }
+                }
+              }
+            }
+          } ,  
+          "409": {
+            "description": "error de entrada duplicada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ya existe un Cliente registrado con ese ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+
+
+
+    "/obtenerServicios": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Servicio"],
+        "summary": "Listar todos los Usuarios",
+        "description":"Este endpoint permite obtener un listado de los servicios registrados en el sistema",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de servicios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "serv_id"        : { "type": "integer" },
+                      "serv_tipo"      : { "type": "string" },
+                      "serv_precio"    : { "type": "string" }
+                    },
+                    "example": {
+                      "serv_id"     : 2,
+                      "serv_tipo"   : "solo barba",
+                      "serv_precio" : "12000"
+                    }                    
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "error de servicio inexistente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "mensaje": { "type": "string" }
+                    },
+                    "example": {
+                      "mensaje": "Ningun servicio obtenido."
+                    }            
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registrarServicio": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Servicio"],
+        "summary": "Registrar un nuevo servicio",
+        "description": "Este endpoint permite registrar un nuevo servicio. Requiere enviar un objeto JSON con los campos serv_tipo y serv_precio.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'serv_tipo', 'serv_precio'"],
+                "properties": {
+                  "serv_tipo"      : { "type": "string" },
+                  "serv_precio"    : { "type": "string" }
+                },
+                "example": {
+                  "serv_tipo"   : "solo barba",
+                  "serv_precio" : "12000"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": " Servicio registrado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": " Se ha registrado el Servicio"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/editarServicio/{serv_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Servicio"],
+        "summary": "Editar un usuario existente",
+        "description": "Este endpoint permite editar un servicio existente mediante su ID. Requiere un objeto JSON con los campos serv_tipo y serv_precio.",
+        "parameters": [
+          {
+            "name": "serv_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'serv_tipo', 'serv_precio'"],
+                "properties": {
+                  "serv_tipo"      : { "type": "string" },
+                  "serv_precio"    : { "type": "string" }
+                },
+                "example": {
+                  "serv_tipo"   : "solo barba",
+                  "serv_precio" : "12000"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el Servicio editado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "se ha editado el servicio"
+                  }
+                }
+              }
+            } 
+          },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/obtenerDetalleServicios": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["DetalleServicio"],
+        "summary": "Listar todos los detalles de servicio",
+        "description": "Este endpoint permite obtener un listado de los detalles de servicios realizados en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de detalles de servicio",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "dtll_id":       { "type": "integer" },
+                      "serv_tipo":     { "type": "string" },
+                      "serv_precio":   { "type": "string" },
+                      "cli_nombre":    { "type": "string" },
+                      "cli_apellido":  { "type": "string" },
+                      "bar_nombre":    { "type": "string" },
+                      "bar_apellido":  { "type": "string" }
+                    },
+                    "example": {
+                      "dtll_id": 5,
+                      "serv_tipo": "corte + barba",
+                      "serv_precio": "20000",
+                      "cli_nombre": "Carlos",
+                      "cli_apellido": "Pérez",
+                      "bar_nombre": "Luis",
+                      "bar_apellido": "Gómez"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontraron detalles de servicio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ningún Detalle de Servicio Obtenido"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registrarDetalleServicio": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["DetalleServicio"],
+        "summary": "Registrar un nuevo detalle de servicio",
+        "description": "Este endpoint permite registrar un nuevo detalle de servicio. Requiere enviar un objeto JSON con los campos dtll_serv_id, dtll_cli_id y dtll_bar_id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["dtll_serv_id", "dtll_cli_id", "dtll_bar_id"],
+                "properties": {
+                  "dtll_serv_id": { "type": "integer" },
+                  "dtll_cli_id":  { "type": "integer" },
+                  "dtll_bar_id":  { "type": "integer" }
+                },
+                "example": {
+                  "dtll_serv_id": 2,
+                  "dtll_cli_id": 4,
+                  "dtll_bar_id": 1
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Detalle registrado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Se ha registrado el Detalle del Servicio Realizado"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos faltantes o vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID de servicio, cliente o barbero no encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Uy, parece que no hay ningún servicio con ese ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/editarDetalleServicio/{dtll_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["DetalleServicio"],
+        "summary": "Editar un detalle de servicio existente",
+        "description": "Este endpoint permite editar un detalle de servicio existente mediante su ID. Requiere un objeto JSON con los campos dtll_serv_id, dtll_cli_id y dtll_bar_id.",
+        "parameters": [
+          {
+            "name": "dtll_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["dtll_serv_id", "dtll_cli_id", "dtll_bar_id"],
+                "properties": {
+                  "dtll_serv_id": { "type": "integer" },
+                  "dtll_cli_id":  { "type": "integer" },
+                  "dtll_bar_id":  { "type": "integer" }
+                },
+                "example": {
+                  "dtll_serv_id": 3,
+                  "dtll_cli_id": 5,
+                  "dtll_bar_id": 2
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detalle de servicio editado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Se ha editado el Detalle del Servicio Realizado"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos faltantes o vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID no encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "No existe un detalle de servicio con ese ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    
