@@ -1,38 +1,40 @@
 from flask import Blueprint, jsonify, request, current_app
+from werkzeug.security import check_password_hash
 import jwt
 import datetime
+
 
 login_bp = Blueprint('login', __name__)
 
 @login_bp.route("/acceso", methods=["POST"])
 def login_flutter():
-    usuario = request.json.get("usu_usuario").strip()
-    contraseña = request.json.get("usu_contraseña").strip()
-    if not usuario or not contraseña:
-        return jsonify({"mensaje": "Para iniciar sesión debes llenar todos los campos"}), 400
-    cursor = current_app.mysql.connection.cursor()
-    cursor.execute(
-        "SELECT * FROM t_usuario WHERE usu_usuario = %s AND usu_contraseña = %s",(usuario, contraseña))
-    account = cursor.fetchone()
-    cursor.close()
-    if account:
-        token = jwt.encode({
-            'usuario_id': account[0],
-            'nombre': account[1],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
-        }, current_app.config['SECRET_KEY'], algorithm='HS256')
-        return jsonify({
-            "mensaje": f"Sesión iniciada con éxito {account[1]}",
-            "token": token
-        }), 200
-    cursor = current_app.mysql.connection.cursor()
-    cursor.execute("SELECT * FROM t_usuario WHERE usu_usuario = %s", (usuario,))
-    user = cursor.fetchone() 
-    if not user:
-        return jsonify({"mensaje": "Ups, ese usuario parece estar incorrecto"}), 404
-    cursor.execute("SELECT * FROM t_usuario WHERE usu_contraseña = %s", (contraseña,))
-    contraseña = cursor.fetchone()
-    cursor.close()
-    if not contraseña:
-        return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404
-    return jsonify({"mensaje": "Credenciales inválidas"}), 400
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    if 'usu_usuario' in request.json and 'usu_contrasena' in request.json:
+        usuario = request.json.get("usu_usuario").strip()
+        contraseña = request.json.get("usu_contrasena").strip()
+        if not usuario or not contraseña:
+            return jsonify({"mensaje": "Para iniciar sesión debes llenar todos los campos"}), 400
+        
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT * FROM t_usuario WHERE usu_usuario = %s", (usuario,))
+        user = cursor.fetchone() 
+        if not user:
+            return jsonify({"mensaje": "Ups, ese usuario parece estar incorrecto"}), 404
+        
+        contra_hash = user[8] #el 8 es la posicion de la contraseña de la informacion que esta retornando de usuario
+        if not check_password_hash(contra_hash, contraseña):
+            return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
+        cursor.close()
+        if user:
+            token = jwt.encode({
+                'usuario_id': user[0],
+                'nombre': user[1],
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+            }, current_app.config['SECRET_KEY'], algorithm='HS256')
+            return jsonify({
+                "mensaje": f"Sesión iniciada con éxito {user[1]}",
+                "token": token
+            }), 200
+    return jsonify({"mensaje" : "Error faltan campos en la peticion"}), 404
