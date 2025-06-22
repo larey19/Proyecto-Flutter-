@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app, session
+from werkzeug.security import generate_password_hash, check_password_hash
 from .auth import token
 usuarios_bp = Blueprint('usuarios', __name__)
 
 # Ruta Para Obtener todos los usuarios Registrados en la base de datos 
 @usuarios_bp.route("/obtenerUsuarios") 
-@token
+# @token
 def GETusuarios():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario") #Realizar consulta SQL
@@ -20,7 +21,6 @@ def GETusuarios():
             "usu_tipo_doc":usuario[5], 
             "usu_num_doc":usuario[6], 
             "usu_usuario":usuario[7], 
-            "usu_contraseña":usuario[8], 
             "usu_estado":usuario[9], 
             "usu_genero":usuario[10]})
     if len(USUARIOS) < 1:
@@ -31,6 +31,9 @@ def GETusuarios():
 @usuarios_bp.route("/registrarUsuario", methods=["POST", "GET"])
 @token
 def POSTusuario():
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
     # Creamos una variable que almacene todas las CLAVE a pedir 
     requerido = ["usu_nombre", #Cada CLAVE como la tenemos en la base de datos, menos el id porque es AI
             "usu_apellido",
@@ -39,7 +42,7 @@ def POSTusuario():
             "usu_tipo_doc", 
             "usu_num_doc" ,
             "usu_usuario" ,
-            "usu_contraseña", 
+            "usu_contrasena", 
             "usu_estado", 
             "usu_genero"]
     # creamos una variable con la que podemos exigir a una CLAVE estar en la la Peticion al servidor 
@@ -58,7 +61,7 @@ def POSTusuario():
     tipo_doc            = peticion["usu_tipo_doc"]
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
-    contraseña          = peticion["usu_contraseña"]
+    contraseña          = generate_password_hash(peticion["usu_contrasena"])
     estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
@@ -75,9 +78,15 @@ def POSTusuario():
     if sql: 
         return jsonify({"mensaje" : "Ya existe un registro asociado con ese numero de identificacion"}), 409
 
+    if estado.lower() not in ['activo', 'inactivo']:
+        return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
+    
+    if tipo_doc.lower() not in ['cc', 'ti', 'ce', 'otro']:
+        return jsonify({"mensaje" : "Esta digitando un tipo de documento desconocido"})
+    
     #si cumple con las validaciones Insertamos el Nuevo Usuario
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("INSERT INTO t_usuario (usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contraseña, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero))
+    cursor.execute("INSERT INTO t_usuario (usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el Usuario"}), 200
 
@@ -85,6 +94,9 @@ def POSTusuario():
 @usuarios_bp.route("/editarUsuario/<usu_id>", methods=["PUT"])
 @token
 def PUTusuario(usu_id):    
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
     requerido = ["usu_nombre",
             "usu_apellido",
             "usu_telefono" ,
@@ -92,7 +104,7 @@ def PUTusuario(usu_id):
             "usu_tipo_doc", 
             "usu_num_doc" ,
             "usu_usuario" ,
-            "usu_contraseña", 
+            "usu_contrasena", 
             # "usu_estado", 
             "usu_genero"]
     peticion            = request.json  
@@ -106,7 +118,7 @@ def PUTusuario(usu_id):
     tipo_doc            = peticion["usu_tipo_doc"]
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
-    contraseña          = peticion["usu_contraseña"]
+    contraseña          = generate_password_hash(peticion["usu_contrasena"])
     # estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
@@ -129,7 +141,7 @@ def PUTusuario(usu_id):
 
     #Realizamos la actualizacion de los datos del usuario (MENOS DE LOS CAMPOS USU_ESTADO y USU_ID)
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contraseña=%s, usu_genero=%s WHERE usu_id = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_id))
+    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_genero=%s WHERE usu_id = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_id))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
@@ -137,12 +149,18 @@ def PUTusuario(usu_id):
 @usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
 @token
 def PUTestado(usu_id):
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    
     cursor = current_app.mysql.connection.cursor() #hacemos la conexion
     cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (usu_id,)) #realiazamos consulta sql
     sql = cursor.fetchone()#obtenemos un solo resultado
     if not sql: #si no hay resultado de la consulta retorna mensaje
         return jsonify({"mensaje" : "Parece que intentas actualizar el estado de un usuario que no existe"}), 404
     estado = request.json["usu_estado"] #creamos variable estado que contenga requerida la CLAVE "usu_estado" en la peticion
+    if estado.lower() not in ['activo', 'inactivo']:
+        return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
     cursor = current_app.mysql.connection.cursor() #hacemos conexion
     cursor.execute("UPDATE t_usuario SET usu_estado=%s WHERE usu_id = %s", (estado, usu_id)) #realizamos consulta sql
     cursor.connection.commit() # no me acuerdo pa que funciona esta
