@@ -1,5 +1,4 @@
 {
-  
   "openapi": "3.0.0",
   "components": {
     "securitySchemes": {
@@ -25,9 +24,6 @@
     },
     {
       "url": "http://10.2.125.234:4000"
-    },
-    {
-      "url": "https://proyecto-flutter-yt33.onrender.com"
     }
   ],
   "tags":[
@@ -65,14 +61,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["usu_usuario", "usu_contraseña"],
+                "required": ["usu_usuario", "usu_contrasena"],
                 "properties": {
                   "usu_usuario": { "type": "string" },
-                  "usu_contraseña": { "type": "string" }
+                  "usu_contrasena": { "type": "string" }
                 },
                 "example": {
                   "usu_usuario": "carlos123",
-                  "usu_contraseña": "1234"
+                  "usu_contrasena": "1234"
                 }
               }
             }
@@ -160,7 +156,7 @@
                       "usu_tipo_doc"  : { "type": "string" },
                       "usu_num_doc"   : { "type": "string" }, 
                       "usu_usuario"   : { "type": "string" },
-                      "usu_contraseña": { "type": "string" },
+                      "usu_contrasena": { "type": "string" },
                       "usu_estado"    : { "type": "string" },
                       "usu_genero"    : { "type": "string" }
                     },
@@ -173,7 +169,7 @@
                       "usu_tipo_doc": "ti",
                       "usu_num_doc": "122334455",
                       "usu_usuario": "marianat",
-                      "usu_contraseña": "marianapass321",
+                      "usu_contrasena": "marianapass321",
                       "usu_estado": "activo",
                       "usu_genero": "Femenino"
                     }
@@ -208,14 +204,14 @@
         }],
         "tags":["Usuario"],
         "summary": "Registrar un nuevo usuario",
-        "description": "Este endpoint permite registrar un nuevo usuario en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contraseña, usu_estado y usu_genero.",
+        "description": "Este endpoint permite registrar un nuevo usuario en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado y usu_genero.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contraseña', 'usu_estado', 'usu_genero'"],
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contrasena', 'usu_estado', 'usu_genero'"],
                 "properties": {
                   "usu_nombre"    : { "type": "string" },
                   "usu_apellido"  : { "type": "string" },
@@ -224,7 +220,7 @@
                   "usu_tipo_doc"  : { "type": "string" },
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
-                  "usu_contraseña": { "type": "string" },
+                  "usu_contrasena": { "type": "string" },
                   "usu_estado"    : { "type": "string" },
                   "usu_genero"    : { "type": "string" }
                 },
@@ -236,7 +232,7 @@
                   "usu_tipo_doc": "ti",
                   "usu_num_doc": "122334455",
                   "usu_usuario": "marianat",
-                  "usu_contraseña": "marianapass321",
+                  "usu_contrasena": "marianapass321",
                   "usu_estado": "activo",
                   "usu_genero": "Femenino"
                 }
@@ -303,7 +299,7 @@
         }],
         "tags":["Usuario"],
         "summary": "Editar un usuario existente",
-        "description": "Este endpoint permite registrar un nuevo aprendiz en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contraseña, usu_estado y usu_genero.",
+        "description": "Este endpoint permite registrar un nuevo aprendiz en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado y usu_genero.",
         "parameters": [
           {
             "name": "usu_id",
@@ -318,7 +314,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contraseña', 'usu_estado', 'usu_genero'"],
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contrasena', 'usu_estado', 'usu_genero'"],
                 "properties": {
                   "usu_nombre"    : { "type": "string" },
                   "usu_apellido"  : { "type": "string" },
@@ -327,7 +323,7 @@
                   "usu_tipo_doc"  : { "type": "string" },
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
-                  "usu_contraseña": { "type": "string" },
+                  "usu_contrasena": { "type": "string" },
                   "usu_genero"    : { "type": "string" }
                 },
                 "example": {
@@ -338,7 +334,7 @@
                   "usu_tipo_doc": "ti",
                   "usu_num_doc": "122334455",
                   "usu_usuario": "marianat",
-                  "usu_contraseña": "marianapass321",
+                  "usu_contrasena": "marianapass321",
                   "usu_genero": "Femenino"
                 }
               }
@@ -492,7 +488,7 @@
                   "usu_tipo_doc"  : { "type": "string" },
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
-                  "usu_contraseña": { "type": "string" },
+                  "usu_contrasena": { "type": "string" },
                   "usu_estado"    : { "type": "string" },
                   "usu_genero"    : { "type": "string" },
                   "usu_salario"   : { "type": "string" }
@@ -501,7 +497,7 @@
                     "bar_salario": "1500000",
                     "bar_usu_id": 3,
                     "usu_apellido": "Rodríguez",
-                    "usu_contraseña": "claveAndres789",
+                    "usu_contrasena": "claveAndres789",
                     "usu_correo": "andres.rodriguez@example.com",
                     "usu_estado": "activo",
                     "usu_genero": "Masculino",
@@ -637,7 +633,7 @@
                     "properties": {
                     "cli_usu_id"    : { "type": "integer" },
                     "usu_apellido"  : { "type": "string" },
-                    "usu_contraseña": { "type": "string" },
+                    "usu_contrasena": { "type": "string" },
                     "usu_correo"    : { "type": "string" },
                     "usu_estado"    : { "type": "string" },
                     "usu_genero"    : { "type": "string" },
@@ -650,7 +646,7 @@
                     "example" : {
                       "cli_usu_id": 2,
                       "usu_apellido": "Gómez",
-                      "usu_contraseña": "securepass456",
+                      "usu_contrasena": "securepass456",
                       "usu_correo": "laura.gomez@example.com",
                       "usu_estado": "activo",
                       "usu_genero": "Femenino",
@@ -1187,4 +1183,3 @@
     }
   }
 }
-    
