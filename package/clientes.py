@@ -20,7 +20,6 @@ def GETclientes():
             "usu_tipo_doc":cliente[5], 
             "usu_num_doc":cliente[6], 
             "usu_usuario":cliente[7], 
-            "usu_contraseña":cliente[8], 
             "usu_estado":cliente[9], 
             "usu_genero":cliente[10]})
     if len(CLIENTES) < 1:
@@ -31,6 +30,9 @@ def GETclientes():
 @clientes_bp.route("/registrarCliente", methods=["POST", "GET"]) 
 @token
 def POSTcliente():
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
     if 'cli_usu_id' in request.json:
         cli_usu_id = request.json["cli_usu_id"]
         cursor = current_app.mysql.connection.cursor()
