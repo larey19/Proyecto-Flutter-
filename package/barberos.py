@@ -20,7 +20,6 @@ def GETbarberos():
             "usu_tipo_doc":barbero[5], 
             "usu_num_doc":barbero[6], 
             "usu_usuario":barbero[7], 
-            "usu_contraseña":barbero[8], 
             "usu_estado":barbero[9], 
             "usu_genero":barbero[10],
             "bar_salario": barbero[12],
@@ -33,6 +32,9 @@ def GETbarberos():
 @barberos_bp.route("/registrarBarbero", methods=["POST", "GET"]) 
 @token
 def POSTbarberos():
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
     if 'bar_salario' in request.json and 'bar_usu_id' in request.json:
         bar_usu_id = request.json["bar_usu_id"]
         bar_salario = request.json["bar_salario"]
