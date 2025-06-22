@@ -20,10 +20,7 @@
 
   "servers": [
     {
-      "url": " http://127.0.0.1:4000"
-    },
-    {
-      "url": "http://10.2.125.234:4000"
+      "url": "https://github.com/larey19/Proyecto-Flutter-"
     }
   ],
   "tags":[
