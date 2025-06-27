@@ -29,7 +29,7 @@ def GETusuarios():
 
 # Ruta Para Registrar un usuario en la base de datos 
 @usuarios_bp.route("/registrarUsuario", methods=["POST", "GET"])
-@token
+# @token
 def POSTusuario():
     data = request.get_json(silent=True)  
     if data is None:
@@ -92,7 +92,7 @@ def POSTusuario():
 
 #Ruta para Editar un usuario
 @usuarios_bp.route("/editarUsuario/<usu_id>", methods=["PUT"])
-@token
+# @token
 def PUTusuario(usu_id):    
     data = request.get_json(silent=True)  
     if data is None:
@@ -147,7 +147,7 @@ def PUTusuario(usu_id):
 
 #ruta para cambiar el estado de un usuario
 @usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
-@token
+# @token
 def PUTestado(usu_id):
     data = request.get_json(silent=True)  
     if data is None:
