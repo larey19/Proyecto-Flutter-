@@ -3,7 +3,7 @@ from .auth import token
 servicios_bp = Blueprint("servicios", __name__)
 
 @servicios_bp.route("/obtenerServicios")
-@token
+# @token
 def GETservicios():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_servicio") #Realizar consulta SQL
@@ -19,7 +19,7 @@ def GETservicios():
     return jsonify(SERVICIOS), 200
 
 @servicios_bp.route("/registrarServicio", methods=["GET","POST"])
-@token
+# @token
 def POSTservicio():
     data = request.get_json(silent=True)  
     if data is None:
@@ -37,7 +37,7 @@ def POSTservicio():
         return jsonify({"mensaje":"Debe digitar el Tipo de Servicio y el Precio de este mismo!"}), 400
 
 @servicios_bp.route("/editarServicio/<serv_id>", methods=["PUT"])
-@token
+# @token
 def PUTservicio(serv_id):
     data = request.get_json(silent=True)  
     if data is None:
