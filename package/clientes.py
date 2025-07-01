@@ -4,7 +4,7 @@ clientes_bp = Blueprint('clientes', __name__)
 
 # Ruta Para Obtener todos los clientes Registrados en la base de datos 
 @clientes_bp.route("/obtenerClientes", methods=['GET']) 
-# @token
+@token
 def GETclientes():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario INNER JOIN t_cliente ON usu_id = cli_usu_id") #Realizar consulta SQL
@@ -28,7 +28,7 @@ def GETclientes():
 
 #ruta para Registar un cliente
 @clientes_bp.route("/registrarCliente", methods=["POST", "GET"]) 
-# @token
+@token
 def POSTcliente():
     data = request.get_json(silent=True)  
     if data is None:
