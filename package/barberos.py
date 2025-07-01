@@ -4,7 +4,7 @@ barberos_bp = Blueprint('barberos', __name__)
 
 # Ruta Para Obtener todos los barberos Registrados en la base de datos 
 @barberos_bp.route("/obtenerBarberos") 
-# @token
+@token
 def GETbarberos():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario INNER JOIN t_barbero ON usu_id = bar_usu_id") #Realizar consulta SQL
@@ -30,7 +30,7 @@ def GETbarberos():
 
 #ruta para Registar un Barbero
 @barberos_bp.route("/registrarBarbero", methods=["POST", "GET"]) 
-# @token
+@token
 def POSTbarberos():
     data = request.get_json(silent=True)  
     if data is None:
