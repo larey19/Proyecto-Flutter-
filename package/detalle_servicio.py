@@ -3,12 +3,12 @@ from .auth import token
 detal_servicios_bp = Blueprint("detal_servicios", __name__)
 
 @detal_servicios_bp.route("/obtenerDetalleServicios")
-@token
+# @token
 def GETservicios():
     cursor = current_app.mysql.connection.cursor()
     cursor.execute("""
                     SELECT 
-                        dtll_id,
+                        dtll_id, det_cli_id, det_barid,
                         serv.serv_tipo, serv.serv_precio,
                         u_cli.usu_nombre AS cli_nombre, u_cli.usu_apellido AS cli_apellido,
                         u_bar.usu_nombre AS bar_nombre, u_bar.usu_apellido AS bar_apellido
