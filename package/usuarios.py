@@ -5,7 +5,7 @@ usuarios_bp = Blueprint('usuarios', __name__)
 
 # Ruta Para Obtener todos los usuarios Registrados en la base de datos 
 @usuarios_bp.route("/obtenerUsuarios") 
-# @token
+@token
 def GETusuarios():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario") #Realizar consulta SQL
@@ -92,7 +92,7 @@ def POSTusuario():
 
 #Ruta para Editar un usuario
 @usuarios_bp.route("/editarUsuario/<usu_id>", methods=["PUT"])
-# @token
+@token
 def PUTusuario(usu_id):    
     data = request.get_json(silent=True)  
     if data is None:
@@ -105,7 +105,7 @@ def PUTusuario(usu_id):
             "usu_num_doc" ,
             "usu_usuario" ,
             "usu_contrasena", 
-            # "usu_estado", 
+            "usu_estado", 
             "usu_genero"]
     peticion            = request.json  
     DatosFaltantes = [ x for x in requerido if x not in peticion or not str(peticion[x]).strip()]
@@ -119,7 +119,7 @@ def PUTusuario(usu_id):
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
     contraseña          = generate_password_hash(peticion["usu_contrasena"])
-    # estado              = peticion["usu_estado"]
+    estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
     #Realizamos validaciones antes de actualizar el usuario
@@ -141,13 +141,13 @@ def PUTusuario(usu_id):
 
     #Realizamos la actualizacion de los datos del usuario (MENOS DE LOS CAMPOS USU_ESTADO y USU_ID)
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_genero=%s WHERE usu_id = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_id))
+    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_estado=%s, usu_genero=%s WHERE usu_id = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero, usu_id))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
 #ruta para cambiar el estado de un usuario
 @usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
-# @token
+@token
 def PUTestado(usu_id):
     data = request.get_json(silent=True)  
     if data is None:
