@@ -8,7 +8,7 @@ def GETservicios():
     cursor = current_app.mysql.connection.cursor()
     cursor.execute("""
                     SELECT 
-                        dtll_id, dtll_cli_id, dtll_bar_id,
+                        # dtll_id, dtll_cli_id, dtll_bar_id,
                         serv.serv_tipo, serv.serv_precio,
                         u_cli.usu_nombre AS cli_nombre, u_cli.usu_apellido AS cli_apellido,
                         u_bar.usu_nombre AS bar_nombre, u_bar.usu_apellido AS bar_apellido
