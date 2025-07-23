@@ -43,12 +43,12 @@ def POSTdetalServicio():
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
     
-    if 'dtll_serv_id' in request.json and 'dtll_cli_id' in request.json and 'dtll_bar_id' in request.json:
+    if 'dtll_serv_id' in request.json and 'dtll_cli_num_doc' in request.json and 'dtll_bar_num_doc' in request.json:
         dtll_serv_id = request.json["dtll_serv_id"]
-        dtll_cli_id = request.json["dtll_cli_id"]
-        dtll_bar_id = request.json["dtll_bar_id"]
+        dtll_cli_num_doc = request.json["dtll_cli_num_doc"]
+        dtll_bar_num_doc = request.json["dtll_bar_num_doc"]
         
-        if not all([dtll_serv_id, dtll_cli_id, dtll_bar_id]): 
+        if not all([dtll_serv_id, dtll_cli_num_doc, dtll_bar_num_doc]): 
             return jsonify({"mensaje": "Faltan campos por rellenar"}), 400
         
         cursor = current_app.mysql.connection.cursor()
@@ -56,12 +56,14 @@ def POSTdetalServicio():
         if not cursor.fetchone():
             return jsonify({"mensaje": "Uy, parece que no hay ningún servicio con ese ID"}), 404
 
-        cursor.execute("SELECT * FROM t_cliente WHERE cli_id = %s", (dtll_cli_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT cli_id FROM t_usuario JOIN t_cliente ON usu_id = cli_usu_id WHERE usu_num_doc = %s", (dtll_cli_num_doc,))
+        dtll_cli_id = cursor.fetchone()
+        if not dtll_cli_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún cliente con ese ID"}), 404
 
-        cursor.execute("SELECT * FROM t_barbero WHERE bar_id = %s", (dtll_bar_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT bar_id FROM t_usuario JOIN t_barbero ON usu_id = bar_usu_id WHERE usu_num_doc = %s", (dtll_bar_num_doc,))
+        dtll_bar_id = cursor.fetchone()
+        if not dtll_bar_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún barbero con ese ID"}), 404
 
         cursor.execute("INSERT INTO t_dtll_serv (dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s)", (dtll_serv_id, dtll_cli_id, dtll_bar_id))
@@ -76,29 +78,28 @@ def PUTdetalleServicio(dtll_id):
     data = request.get_json(silent=True)  
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
-    if 'dtll_serv_id' in request.json and 'dtll_cli_id' in request.json and 'dtll_bar_id' in request.json:
+    if 'dtll_serv_id' in request.json and 'dtll_cli_num_doc' in request.json and 'dtll_bar_num_doc' in request.json:
         dtll_serv_id = request.json["dtll_serv_id"]
-        dtll_cli_id = request.json["dtll_cli_id"]
-        dtll_bar_id = request.json["dtll_bar_id"]
+        dtll_cli_num_doc = request.json["usu_num_doc"]
+        dtll_bar_num_doc = request.json["usu_num_doc"]
 
-        if not all([dtll_serv_id, dtll_cli_id, dtll_bar_id]):
+        
+        if not all([dtll_serv_id, dtll_cli_num_doc, dtll_bar_num_doc]): 
             return jsonify({"mensaje": "Faltan campos por rellenar"}), 400
-
+        
         cursor = current_app.mysql.connection.cursor()
-        cursor.execute("SELECT * FROM t_dtll_serv WHERE dtll_id = %s", (dtll_id,))
-        if not cursor.fetchone():
-            return jsonify({"mensaje": "No existe un detalle de servicio con ese ID"}), 404
-
         cursor.execute("SELECT * FROM t_servicio WHERE serv_id = %s", (dtll_serv_id,))
         if not cursor.fetchone():
             return jsonify({"mensaje": "Uy, parece que no hay ningún servicio con ese ID"}), 404
 
-        cursor.execute("SELECT * FROM t_cliente WHERE cli_id = %s", (dtll_cli_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT cli_id FROM t_usuario JOIN t_cliente ON usu_id = cli_usu_id WHERE usu_num_doc = %s", (dtll_cli_num_doc,))
+        dtll_cli_id = cursor.fetchone()
+        if not dtll_cli_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún cliente con ese ID"}), 404
 
-        cursor.execute("SELECT * FROM t_barbero WHERE bar_id = %s", (dtll_bar_id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT bar_id FROM t_usuario JOIN t_barbero ON usu_id = bar_usu_id WHERE usu_num_doc = %s", (dtll_bar_num_doc,))
+        dtll_bar_id = cursor.fetchone()
+        if not dtll_bar_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún barbero con ese ID"}), 404
 
         cursor.execute("""
