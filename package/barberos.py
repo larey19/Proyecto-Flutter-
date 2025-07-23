@@ -12,9 +12,9 @@ def GETbarberos():
     BARBEROS = []
     for barbero in sql: #Recorrer todos los resutados de la consulta
         BARBEROS.append({ #Creamos tipo Diccinario CLAVE : VALOR
-            "bar_usu_id":barbero[0], #La clave tal cual como la tenemos en la base de datos "bar_usu_id" y el valor seran los indices [Posicion] de recorrer la consulta for ("barberos") in sql
+            "bar_id":barbero[11], #La clave tal cual como la tenemos en la base de datos "bar_usu_id" y el valor seran los indices [Posicion] de recorrer la consulta for ("barberos") in sql
             "usu_nombre":barbero[1] ,
-            "usu_apellido":barbero[2],
+            "usu_apellido":barbero[2], 
             "usu_telefono":barbero[3], 
             "usu_correo":barbero[4], 
             "usu_tipo_doc":barbero[5], 
@@ -35,20 +35,20 @@ def POSTbarberos():
     data = request.get_json(silent=True)  
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
-    if 'bar_salario' in request.json and 'bar_usu_id' in request.json:
-        bar_usu_id = request.json["bar_usu_id"]
+    if 'bar_salario' in request.json and 'usu_num_doc' in request.json:
+        usu_num_doc = request.json["usu_num_doc"]
         bar_salario = request.json["bar_salario"]
         cursor = current_app.mysql.connection.cursor()
-        cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (bar_usu_id,))
+        cursor.execute("SELECT usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
         sql = cursor.fetchone()
         if not sql: 
             return jsonify({"mensaje" : "No existe un usuario registrado con ese ID"}),404
-        cursor.execute("SELECT bar_usu_id FROM t_barbero WHERE bar_usu_id = %s", (bar_usu_id,))
+        cursor.execute("SELECT bar_id FROM t_usuario JOIN t_barbero ON usu_id = bar_usu_id WHERE usu_num_doc = %s", (usu_num_doc,))
         sql = cursor.fetchone()
         if sql: 
-            return jsonify({"mensaje" : "Ya existe un barberos registrado con ese ID"}),409
+            return jsonify({"mensaje" : "Ya existe un barbero registrado con ese ID"}),409
         cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-        cursor.execute("INSERT INTO t_barbero (bar_salario, bar_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_barbero ON bar_usu_id = usu_id WHERE usu_id = %s", (bar_salario, bar_usu_id,)) #realiazamos consulta sql
+        cursor.execute("INSERT INTO t_barbero (bar_salario, bar_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_barbero ON usu_num_doc = usu_id WHERE usu_num_doc = %s", (bar_salario, usu_num_doc,)) #realiazamos consulta sql
         cursor = current_app.mysql.connection.cursor() #hacemos conexion
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el barbero"}),200
