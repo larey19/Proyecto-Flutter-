@@ -29,7 +29,7 @@ def GETusuarios():
 
 # Ruta Para Registrar un usuario en la base de datos 
 @usuarios_bp.route("/registrarUsuario", methods=["POST", "GET"])
-# @token
+@token
 def POSTusuario():
     data = request.get_json(silent=True)  
     if data is None:
@@ -91,9 +91,9 @@ def POSTusuario():
     return jsonify({"mensaje":"Se ha registrado el Usuario"}), 200
 
 #Ruta para Editar un usuario
-@usuarios_bp.route("/editarUsuario/<usu_id>", methods=["PUT"])
+@usuarios_bp.route("/editarUsuario/<usu_num_doc>", methods=["PUT"])
 @token
-def PUTusuario(usu_id):    
+def PUTusuario(usu_num_doc):    
     data = request.get_json(silent=True)  
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
@@ -124,44 +124,44 @@ def PUTusuario(usu_id):
     
     #Realizamos validaciones antes de actualizar el usuario
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (usu_id,))
+    cursor.execute("SELECT usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
     sql = cursor.fetchone()
     if not sql: 
         return jsonify({"mensaje" : "Parece que intentas actualizar un registro que NO existe"}), 404
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("SELECT usu_correo, usu_id FROM t_usuario WHERE usu_correo = %s AND usu_id != %s", (correo, usu_id,))
+    cursor.execute("SELECT usu_correo, usu_num_doc FROM t_usuario WHERE usu_correo = %s AND usu_num_doc != %s", (correo, usu_num_doc,))
     sql = cursor.fetchone()
     if sql: 
         return jsonify({"mensaje" : "No puedes utilizar ese correo porque ya esta asociado a un registro"}), 409
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("SELECT usu_num_doc, usu_id FROM t_usuario WHERE usu_num_doc = %s AND usu_id != %s", (num_doc, usu_id,))
+    cursor.execute("SELECT usu_num_doc FROM t_usuario WHERE usu_num_doc = %s AND usu_num_doc != %s", (num_doc, usu_num_doc))
     sql = cursor.fetchone()
     if sql: 
         return jsonify({"mensaje" : "No puedes utilizar ese numero de documento porque ya esta asociado a un registro"}), 409
 
     #Realizamos la actualizacion de los datos del usuario (MENOS DE LOS CAMPOS USU_ESTADO y USU_ID)
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_estado=%s, usu_genero=%s WHERE usu_id = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero, usu_id))
+    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_genero=%s WHERE usu_num_doc = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_num_doc))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
 #ruta para cambiar el estado de un usuario
-@usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
-@token
-def PUTestado(usu_id):
-    data = request.get_json(silent=True)  
-    if data is None:
-        return jsonify({"error": "Error en la formacion del JSON"}), 400
+# @usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
+# @token
+# def PUTestado(usu_id):
+#     data = request.get_json(silent=True)  
+#     if data is None:
+#         return jsonify({"error": "Error en la formacion del JSON"}), 400
     
-    cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-    cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (usu_id,)) #realiazamos consulta sql
-    sql = cursor.fetchone()#obtenemos un solo resultado
-    if not sql: #si no hay resultado de la consulta retorna mensaje
-        return jsonify({"mensaje" : "Parece que intentas actualizar el estado de un usuario que no existe"}), 404
-    estado = request.json["usu_estado"] #creamos variable estado que contenga requerida la CLAVE "usu_estado" en la peticion
-    if estado.lower() not in ['activo', 'inactivo']:
-        return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
-    cursor = current_app.mysql.connection.cursor() #hacemos conexion
-    cursor.execute("UPDATE t_usuario SET usu_estado=%s WHERE usu_id = %s", (estado, usu_id)) #realizamos consulta sql
-    cursor.connection.commit() # no me acuerdo pa que funciona esta
-    return jsonify({"mensaje":"Se ha cambiado el estado del usuario"}), 200
+#     cursor = current_app.mysql.connection.cursor() #hacemos la conexion
+#     cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (usu_id,)) #realiazamos consulta sql
+#     sql = cursor.fetchone()#obtenemos un solo resultado
+#     if not sql: #si no hay resultado de la consulta retorna mensaje
+#         return jsonify({"mensaje" : "Parece que intentas actualizar el estado de un usuario que no existe"}), 404
+#     estado = request.json["usu_estado"] #creamos variable estado que contenga requerida la CLAVE "usu_estado" en la peticion
+#     if estado.lower() not in ['activo', 'inactivo']:
+#         return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
+#     cursor = current_app.mysql.connection.cursor() #hacemos conexion
+#     cursor.execute("UPDATE t_usuario SET usu_estado=%s WHERE usu_id = %s", (estado, usu_id)) #realizamos consulta sql
+#     cursor.connection.commit() # no me acuerdo pa que funciona esta
+#     return jsonify({"mensaje":"Se ha cambiado el estado del usuario"}), 200
