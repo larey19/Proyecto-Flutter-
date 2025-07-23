@@ -138,7 +138,11 @@ def PUTusuario(usu_num_doc):
     sql = cursor.fetchone()
     if sql: 
         return jsonify({"mensaje" : "No puedes utilizar ese numero de documento porque ya esta asociado a un registro"}), 409
-
+    if estado.lower() not in ['activo', 'inactivo']:
+        return jsonify({"mensaje" : "Esta digitando un valor difente de estado"}), 422
+    
+    if tipo_doc.lower() not in ['cc', 'ti', 'ce', 'otro']:
+        return jsonify({"mensaje" : "Esta digitando un tipo de documento desconocido"}), 422
     #Realizamos la actualizacion de los datos del usuario (MENOS DE LOS CAMPOS USU_ESTADO y USU_ID)
     cursor = current_app.mysql.connection.cursor()
     cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_genero=%s WHERE usu_num_doc = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_num_doc))
