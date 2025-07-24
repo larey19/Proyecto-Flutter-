@@ -80,8 +80,8 @@ def PUTdetalleServicio(dtll_id):
         return jsonify({"error": "Error en la formacion del JSON"}), 400
     if 'dtll_serv_id' in request.json and 'dtll_cli_num_doc' in request.json and 'dtll_bar_num_doc' in request.json:
         dtll_serv_id = request.json["dtll_serv_id"]
-        dtll_cli_num_doc = request.json["usu_num_doc"]
-        dtll_bar_num_doc = request.json["usu_num_doc"]
+        dtll_cli_num_doc = request.json["dtll_cli_num_doc"]
+        dtll_bar_num_doc = request.json["dtll_bar_num_doc"]
 
         
         if not all([dtll_serv_id, dtll_cli_num_doc, dtll_bar_num_doc]): 
