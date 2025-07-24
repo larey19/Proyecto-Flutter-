@@ -86,6 +86,10 @@ def PUTdetalleServicio(dtll_id):
         
         if not all([dtll_serv_id, dtll_cli_num_doc, dtll_bar_num_doc]): 
             return jsonify({"mensaje": "Faltan campos por rellenar"}), 400
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT * FROM t_dtll_serv WHERE dtll_id = %s",(dtll_id,))        
+        if not cursor.fetchone():
+            return({"mensaje" : "Uy, parece que no hay ningun detalle de servicio Realizado con ese ID"}), 404
         
         cursor = current_app.mysql.connection.cursor()
         cursor.execute("SELECT * FROM t_servicio WHERE serv_id = %s", (dtll_serv_id,))
