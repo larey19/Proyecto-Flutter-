@@ -126,7 +126,6 @@
       }
     },
 
-
     "/obtenerUsuarios": {
       "get": {
         "security":[{
@@ -176,7 +175,7 @@
             }
           }, 
           "404": {
-            "description": "error de usuario inexistentes.",
+            "description": "alerta de usuarios inexistentes.",
             "content": {
               "application/json": {
                 "schema": {
@@ -194,6 +193,7 @@
         }
       }
     },
+
     "/registrarUsuario": {
       "post": {
         "security":[{
@@ -289,20 +289,20 @@
         }
       }
     },
-    "/editarUsuario/{usu_id}": {
+    "/editarUsuario/{usu_num_doc}": {
       "put": {
         "security":[{
           "bearerAuth" : []
         }],
         "tags":["Usuario"],
         "summary": "Editar un usuario existente",
-        "description": "Este endpoint permite registrar un nuevo aprendiz en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado y usu_genero.",
+        "description": "Este endpoint permite editar un nuevo aprendiz en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado y usu_genero.",
         "parameters": [
           {
-            "name": "usu_id",
+            "name": "usu_num_doc",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -321,18 +321,20 @@
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
                   "usu_contrasena": { "type": "string" },
+                  "usu_estado"    : { "type": "string" },
                   "usu_genero"    : { "type": "string" }
                 },
                 "example": {
-                  "usu_nombre": "Mariana",
                   "usu_apellido": "Torres",
-                  "usu_telefono": "3114455667",
-                  "usu_correo": "marianatorres@example.com",
+                  "usu_correo": "val@example.com",
+                  "usu_estado": "activo",
+                  "usu_genero": "Femenino",
+                  "usu_id": 14,
+                  "usu_nombre": "vale",
+                  "usu_num_doc": "1044133189",
+                  "usu_telefono": "3224000765",
                   "usu_tipo_doc": "ti",
-                  "usu_num_doc": "122334455",
-                  "usu_usuario": "marianat",
-                  "usu_contrasena": "marianapass321",
-                  "usu_genero": "Femenino"
+                  "usu_usuario": "val87"
                 }
               }
             }
@@ -386,21 +388,37 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "error valores ingresados no permitidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Esta digitando un valor difente de estado"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
-    "/cambiarEstado/{usu_id}": {
+    "/cambiarEstado/{usu_num_doc}": {
       "put": {
         "security":[{
           "bearerAuth" : []
         }],
         "tags":["Usuario"],
-        "summary": "Editar Estado de un usuario",
+        "summary": "TEMPORALMENTE NO DISPONIBLE",
         "description":"Este endpoint permite editar el estado de un usuario del sistema utilizando su identificador único ID.",
         "parameters": [
           {
-            "name": "usu_id",
+            "name": "usu_num_doc",
             "in": "path",
             "required": true,
             "schema": { "type": "integer" }
@@ -467,7 +485,7 @@
           "bearerAuth" : []
         }],
         "tags":["Barbero"],
-        "summary": "Buscar barbero registrados en el sistema",
+        "summary": "Lista los barberos registrados en el sistema",
         "description":"Este endpoint permite obtener un listado completo de los barberos registrados en el sistema.",
         "responses": {
           "200": {
@@ -477,7 +495,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                  "bar_usu_id"    : { "type": "integer" },
+                  "bar_id"        : { "type": "integer" },
+                  "usu_salario"   : { "type": "string" },
                   "usu_nombre"    : { "type": "string" },
                   "usu_apellido"  : { "type": "string" },
                   "usu_telefono"  : { "type": "string" },
@@ -487,22 +506,21 @@
                   "usu_usuario"   : { "type": "string" },
                   "usu_contrasena": { "type": "string" },
                   "usu_estado"    : { "type": "string" },
-                  "usu_genero"    : { "type": "string" },
-                  "usu_salario"   : { "type": "string" }
+                  "usu_genero"    : { "type": "string" }
+                  
                   },
                   "example" : {
-                    "bar_salario": "1500000",
-                    "bar_usu_id": 3,
-                    "usu_apellido": "Rodríguez",
-                    "usu_contrasena": "claveAndres789",
-                    "usu_correo": "andres.rodriguez@example.com",
-                    "usu_estado": "activo",
-                    "usu_genero": "Masculino",
-                    "usu_nombre": "Andrés",
-                    "usu_num_doc": "9876543210",
-                    "usu_telefono": "3201122334",
-                    "usu_tipo_doc": "ce",
-                    "usu_usuario": "andresr"
+                  "bar_id": 3,
+                  "bar_salario": "1000000",
+                  "usu_nombre": "Carlos",
+                  "usu_apellido": "Pérez",
+                  "usu_correo": "carlos.perez@prime.com",
+                  "usu_estado": "activo",
+                  "usu_genero": "Masculino",
+                  "usu_num_doc": "1234567890",
+                  "usu_telefono": "3001234567",
+                  "usu_tipo_doc": "cc",
+                  "usu_usuario": "carlosp"
                   }
                 }
               }
@@ -534,21 +552,21 @@
         }],
         "tags":["Barbero"],
         "summary": "Registar un nuevo barbero",
-        "description": "Este endpoint permite registrar un nuevo barbero en el sistema. Requiere enviar un objeto JSON con los siguentes datos como el bar_salario y el bar_usu_id.",
+        "description": "Este endpoint permite registrar un nuevo barbero en el sistema. Requiere enviar un objeto JSON con los siguentes datos como el bar_salario y el usu_num_doc.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["'bar_salario', 'bar_usu_id'"],
+                "required": ["'bar_salario', 'usu_num_doc'"],
                 "properties": {
-                  "bar_salario" : { "type": "string" }, 
-                  "bar_usu_id"  : { "type": "integer" }
+                  "bar_salario"  : { "type": "string" }, 
+                  "usu_num_doc"  : { "type": "integer" }
                 },
                 "example" : {
                   "bar_salario": "1500000",
-                  "bar_usu_id": 3
+                  "usu_num_doc": "1044133189"
                 } 
               }
             }
@@ -563,11 +581,11 @@
                   "type": "array",
                   "properties": {
                     "bar_salario" : { "type": "string" }, 
-                    "bar_usu_id"  : { "type": "integer" }
+                    "usu_num_doc"  : { "type": "string" }
                   },
                   "example" : {
                     "bar_salario": "1500000",
-                    "bar_usu_id": 3
+                    "usu_num_doc": "1044133189"
                   }
                 }
               }
@@ -628,7 +646,7 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                    "cli_usu_id"    : { "type": "integer" },
+                    "cli_id"        : { "type": "integer" },
                     "usu_apellido"  : { "type": "string" },
                     "usu_contrasena": { "type": "string" },
                     "usu_correo"    : { "type": "string" },
@@ -641,7 +659,7 @@
                     "usu_usuario"   : { "type": "string" }
                   },
                     "example" : {
-                      "cli_usu_id": 2,
+                      "cli_id": 2,
                       "usu_apellido": "Gómez",
                       "usu_contrasena": "securepass456",
                       "usu_correo": "laura.gomez@example.com",
@@ -659,7 +677,7 @@
             }
           },
           "404": {
-            "description": "error de clientes inexistentes.",
+            "description": "alerta de clientes inexistentes.",
             "content": {
               "application/json": {
                 "schema": {
@@ -684,19 +702,19 @@
         }],
         "tags":["Cliente"],
         "summary": "Registar un nuevo cliente",
-        "description": "Este endpoint permite registrar un nuevo cliente en el sistema. Requiere enviar un objeto JSON con el siguentes dato cli_usu_id.",
+        "description": "Este endpoint permite registrar un nuevo cliente en el sistema. Requiere enviar un objeto JSON con el siguentes dato usu_num_doc.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["cli_usu_id"],
+                "required": ["usu_num_doc"],
                 "properties": {
-                  "cli_usu_id"    : { "type": "integer" }
+                  "usu_num_doc"    : { "type": "string" }
                 },
                 "example": {
-                  "cli_usu_id": 4
+                  "usu_num_doc" : "122334455"
                 }
               }
             }
@@ -712,10 +730,10 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "cli_usu_id" : { "type": "integer" }
+                      "usu_num_doc" : { "type": "string" }
                     },
                     "example" : {
-                      "mensaje": "Se ha resgistrado el cliente"
+                      "mensaje": "Se ha registrado el cliente"
                     }
                   }
                 }
@@ -949,6 +967,8 @@
         }
       }
     },
+
+
     "/obtenerDetalleServicios": {
       "get": {
         "security":[{
@@ -1015,23 +1035,23 @@
         }],
         "tags": ["DetalleServicio"],
         "summary": "Registrar un nuevo detalle de servicio",
-        "description": "Este endpoint permite registrar un nuevo detalle de servicio. Requiere enviar un objeto JSON con los campos dtll_serv_id, dtll_cli_id y dtll_bar_id.",
+        "description": "Este endpoint permite registrar un nuevo detalle de servicio. Requiere enviar un objeto JSON con los campos dtll_serv_id, dtll_cli_num_doc y dtll_bar_num_doc.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["dtll_serv_id", "dtll_cli_id", "dtll_bar_id"],
+                "required": ["dtll_serv_id", "dtll_cli_num_doc", "dtll_bar_num_doc"],
                 "properties": {
                   "dtll_serv_id": { "type": "integer" },
-                  "dtll_cli_id":  { "type": "integer" },
-                  "dtll_bar_id":  { "type": "integer" }
+                  "dtll_cli_num_doc":  { "type": "string" },
+                  "dtll_bar_num_doc":  { "type": "string" }
                 },
                 "example": {
                   "dtll_serv_id": 2,
-                  "dtll_cli_id": 4,
-                  "dtll_bar_id": 1
+                  "dtll_cli_num_doc": "4124254124",
+                  "dtll_bar_num_doc": "4214141533"
                 }
               }
             }
@@ -1096,7 +1116,7 @@
         }],
         "tags": ["DetalleServicio"],
         "summary": "Editar un detalle de servicio existente",
-        "description": "Este endpoint permite editar un detalle de servicio existente mediante su ID. Requiere un objeto JSON con los campos dtll_serv_id, dtll_cli_id y dtll_bar_id.",
+        "description": "Este endpoint permite editar un detalle de servicio existente mediante su ID. Requiere un objeto JSON con los campos dtll_serv_id, dtll_cli_num_doc y dtll_bar_num_doc.",
         "parameters": [
           {
             "name": "dtll_id",
@@ -1111,16 +1131,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["dtll_serv_id", "dtll_cli_id", "dtll_bar_id"],
+                "required": ["dtll_serv_id", "dtll_cli_num_doc", "dtll_bar_num_doc"],
                 "properties": {
                   "dtll_serv_id": { "type": "integer" },
-                  "dtll_cli_id":  { "type": "integer" },
-                  "dtll_bar_id":  { "type": "integer" }
+                  "dtll_cli_num_doc":  { "type": "string" },
+                  "dtll_bar_num_doc":  { "type": "string" }
                 },
                 "example": {
-                  "dtll_serv_id": 3,
-                  "dtll_cli_id": 5,
-                  "dtll_bar_id": 2
+                  "dtll_serv_id": 2,
+                  "dtll_cli_num_doc": "4124254124",
+                  "dtll_bar_num_doc": "4214141533"
                 }
               }
             }
@@ -1180,3 +1200,4 @@
     }
   }
 }
+    
