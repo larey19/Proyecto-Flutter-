@@ -12,8 +12,8 @@ def GETservicios():
     for serv in sql: #Recorrer todos los resutados de la consulta
         SERVICIOS.append({ #Creamos tipo Diccinario CLAVE : VALOR
             "serv_id":serv[0], #La clave tal cual como la tenemos en la base de datos "serv_id" y el valor seran los indices [Posicion] de recorrer la consulta for ("SERV") in sql
-            "serv_tipo":serv[1] ,
-            "serv_precio":serv[2]})
+            "serv_tipo":serv[2] ,
+            "serv_precio":serv[1]})
     if len(SERVICIOS) < 1:
         return jsonify({"mensaje" : "Ningun Servicio Obtenido"}), 404
     return jsonify(SERVICIOS), 200
