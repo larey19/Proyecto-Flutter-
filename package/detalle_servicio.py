@@ -26,7 +26,7 @@ def GETservicios():
             "dtll_id":      serv[0],
             "serv_tipo":    serv[1],
             "serv_precio":  serv[2],
-            "serv_id":      serv[3],
+            "dtll_serv_id":  serv[3],
             "cli_nombre":   serv[4],
             "cli_apellido": serv[5],
             "dtll_cli_num_doc": serv[6],
