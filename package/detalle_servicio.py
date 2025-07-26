@@ -26,10 +26,13 @@ def GETservicios():
             "dtll_id":      serv[0],
             "serv_tipo":    serv[1],
             "serv_precio":  serv[2],
-            "cli_nombre":   serv[3],
-            "cli_apellido": serv[4],
-            "bar_nombre":   serv[5],
-            "bar_apellido": serv[6]
+            "serv_id":      serv[3],
+            "cli_nombre":   serv[4],
+            "cli_apellido": serv[5],
+            "dtll_cli_num_doc": serv[6],
+            "bar_nombre":   serv[7],
+            "bar_apellido": serv[8],
+            "dtll_bar_num_doc": serv[9]
         })
 
     if len(DTL_SERVICIOS) < 1:
