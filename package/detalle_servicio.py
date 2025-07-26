@@ -9,9 +9,9 @@ def GETservicios():
     cursor.execute("""
                     SELECT 
                         dtll_id,
-                        serv.serv_tipo, serv.serv_precio,
-                        u_cli.usu_nombre AS cli_nombre, u_cli.usu_apellido AS cli_apellido,
-                        u_bar.usu_nombre AS bar_nombre, u_bar.usu_apellido AS bar_apellido
+                        serv.serv_tipo, serv.serv_precio, serv_id,
+                        u_cli.usu_nombre AS cli_nombre, u_cli.usu_apellido AS cli_apellido, u_cli.usu_num_doc AS dtll_cli_num_doc,
+                        u_bar.usu_nombre AS bar_nombre, u_bar.usu_apellido AS bar_apellido, u_bar.usu_num_doc AS dtll_bar_num_doc
                     FROM t_dtll_serv detalle
                     INNER JOIN t_servicio serv ON detalle.dtll_serv_id = serv.serv_id
                     INNER JOIN t_cliente cli ON detalle.dtll_cli_id = cli.cli_id
