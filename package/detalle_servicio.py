@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
+import uuid
 detal_servicios_bp = Blueprint("detal_servicios", __name__)
 
 @detal_servicios_bp.route("/obtenerDetalleServicios")
@@ -47,6 +48,7 @@ def POSTdetalServicio():
         return jsonify({"error": "Error en la formacion del JSON"}), 400
     
     if 'dtll_serv_id' in request.json and 'dtll_cli_num_doc' in request.json and 'dtll_bar_num_doc' in request.json:
+        dtll_id = uuid.uuid4()
         dtll_serv_id = request.json["dtll_serv_id"]
         dtll_cli_num_doc = request.json["dtll_cli_num_doc"]
         dtll_bar_num_doc = request.json["dtll_bar_num_doc"]
@@ -69,7 +71,7 @@ def POSTdetalServicio():
         if not dtll_bar_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún barbero con ese ID"}), 404
 
-        cursor.execute("INSERT INTO t_dtll_serv (dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s)", (dtll_serv_id, dtll_cli_id, dtll_bar_id))
+        cursor.execute("INSERT INTO t_dtll_serv (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s)", (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id))
         cursor.connection.commit()
         return jsonify({"mensaje": "Se ha registrado el Detalle del Servicio Realizado"}), 200
     else:
