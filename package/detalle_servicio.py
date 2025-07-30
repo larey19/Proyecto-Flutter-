@@ -71,7 +71,7 @@ def POSTdetalServicio():
         if not dtll_bar_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún barbero con ese ID"}), 404
 
-        cursor.execute("INSERT INTO t_dtll_serv (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s)", (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id))
+        cursor.execute("INSERT INTO t_dtll_serv (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s, %s)", (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id))
         cursor.connection.commit()
         return jsonify({"mensaje": "Se ha registrado el Detalle del Servicio Realizado"}), 200
     else:
