@@ -48,7 +48,7 @@ def POSTcliente():
             return jsonify({"mensaje" : "Ya existe un Cliente registrado con ese ID"}),409
         
         cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-        cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, usu_num_doc,)) #realiazamos consulta sql
+        cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, usu_num_doc,)) #realiazamos consulta sql
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el cliente"}),200
     else:
