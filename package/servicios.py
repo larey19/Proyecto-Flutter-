@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
+import uuid
 servicios_bp = Blueprint("servicios", __name__)
 
 @servicios_bp.route("/obtenerServicios")
@@ -25,12 +26,13 @@ def POSTservicio():
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
     if 'serv_tipo' in request.json and 'serv_precio' in request.json:
+        serv_id = uuid.uuid4()
         serv_tipo = request.json["serv_tipo"]
         serv_precio = request.json["serv_precio"]
         if len(str(serv_tipo).strip()) < 1 or len(str(serv_precio).strip()) < 1: 
             return jsonify({"mensaje":"Faltan campos por rellenar"}), 400
         cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
-        cursor.execute("INSERT INTO t_servicio (serv_tipo, serv_precio) VALUES (%s, %s)", (serv_tipo, serv_precio,)) #Realizar consulta SQL
+        cursor.execute("INSERT INTO t_servicio (srev_id, serv_tipo, serv_precio) VALUES (%s, %s)", (serv_id, serv_tipo, serv_precio,)) #Realizar consulta SQL
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el Servicio"}), 200
     else:
