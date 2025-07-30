@@ -144,7 +144,7 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "usu_id"        : { "type": "integer" },
+                      "usu_id"        : { "type": "string" },
                       "usu_nombre"    : { "type": "string" },
                       "usu_apellido"  : { "type": "string" },
                       "usu_telefono"  : { "type": "string" },
@@ -157,7 +157,7 @@
                       "usu_genero"    : { "type": "string" }
                     },
                     "example": {
-                      "usu_id": 7,
+                      "usu_id": "d2fa722a-5509-4ee4-8853-0aacd615",
                       "usu_nombre": "Mariana",
                       "usu_apellido": "Torres",
                       "usu_telefono": "3114455667",
@@ -329,7 +329,7 @@
                   "usu_correo": "val@example.com",
                   "usu_estado": "activo",
                   "usu_genero": "Femenino",
-                  "usu_id": 14,
+                  "usu_id": "d2fa722a-5509-4ee4-8853-0aacd615b",
                   "usu_nombre": "vale",
                   "usu_num_doc": "1044133189",
                   "usu_telefono": "3224000765",
@@ -421,7 +421,7 @@
             "name": "usu_num_doc",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -495,7 +495,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                  "bar_id"        : { "type": "integer" },
+                  "bar_id"        : { "type": "string" },
                   "usu_salario"   : { "type": "string" },
                   "usu_nombre"    : { "type": "string" },
                   "usu_apellido"  : { "type": "string" },
@@ -510,7 +510,7 @@
                   
                   },
                   "example" : {
-                  "bar_id": 3,
+                  "bar_id": "d2fa722a-5509-4ee4-8853-0aacd6151c",
                   "bar_salario": "1000000",
                   "usu_nombre": "Carlos",
                   "usu_apellido": "Pérez",
@@ -562,7 +562,7 @@
                 "required": ["'bar_salario', 'usu_num_doc'"],
                 "properties": {
                   "bar_salario"  : { "type": "string" }, 
-                  "usu_num_doc"  : { "type": "integer" }
+                  "usu_num_doc"  : { "type": "string" }
                 },
                 "example" : {
                   "bar_salario": "1500000",
@@ -646,7 +646,7 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                    "cli_id"        : { "type": "integer" },
+                    "cli_id"        : { "type": "string" },
                     "usu_apellido"  : { "type": "string" },
                     "usu_contrasena": { "type": "string" },
                     "usu_correo"    : { "type": "string" },
@@ -659,7 +659,7 @@
                     "usu_usuario"   : { "type": "string" }
                   },
                     "example" : {
-                      "cli_id": 2,
+                      "cli_id": "d2fa722a-5509-4ee4-8853-0aacd615b1",
                       "usu_apellido": "Gómez",
                       "usu_contrasena": "securepass456",
                       "usu_correo": "laura.gomez@example.com",
@@ -797,12 +797,12 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "serv_id"        : { "type": "integer" },
+                      "serv_id"        : { "type": "string" },
                       "serv_tipo"      : { "type": "string" },
                       "serv_precio"    : { "type": "string" }
                     },
                     "example": {
-                      "serv_id"     : 2,
+                      "serv_id"     : "d2fa72-509-4ee4-8853-0aacd615",
                       "serv_tipo"   : "solo barba",
                       "serv_precio" : "12000"
                     }                    
@@ -909,7 +909,7 @@
             "name": "serv_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -987,7 +987,7 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "dtll_id":       { "type": "integer" },
+                      "dtll_id":       { "type": "string" },
                       "serv_tipo":     { "type": "string" },
                       "serv_precio":   { "type": "string" },
                       "cli_nombre":    { "type": "string" },
@@ -996,7 +996,7 @@
                       "bar_apellido":  { "type": "string" }
                     },
                     "example": {
-                      "dtll_id": 5,
+                      "dtll_id": "d2fa722a-5509-4ee4-8853-0cd615bc1c",
                       "serv_tipo": "corte + barba",
                       "serv_precio": "20000",
                       "cli_nombre": "Carlos",
@@ -1044,12 +1044,12 @@
                 "type": "object",
                 "required": ["dtll_serv_id", "dtll_cli_num_doc", "dtll_bar_num_doc"],
                 "properties": {
-                  "dtll_serv_id": { "type": "integer" },
+                  "dtll_serv_id": { "type": "string" },
                   "dtll_cli_num_doc":  { "type": "string" },
                   "dtll_bar_num_doc":  { "type": "string" }
                 },
                 "example": {
-                  "dtll_serv_id": 2,
+                  "dtll_serv_id": "d2fa722a-5509-4ee4-8853-acd615bc1c",
                   "dtll_cli_num_doc": "4124254124",
                   "dtll_bar_num_doc": "4214141533"
                 }
@@ -1122,7 +1122,7 @@
             "name": "dtll_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -1133,12 +1133,12 @@
                 "type": "object",
                 "required": ["dtll_serv_id", "dtll_cli_num_doc", "dtll_bar_num_doc"],
                 "properties": {
-                  "dtll_serv_id": { "type": "integer" },
+                  "dtll_serv_id": { "type": "string" },
                   "dtll_cli_num_doc":  { "type": "string" },
                   "dtll_bar_num_doc":  { "type": "string" }
                 },
                 "example": {
-                  "dtll_serv_id": 2,
+                  "dtll_serv_id": "d2fa722a-5509-4ee4-8853-acd615bc1c",
                   "dtll_cli_num_doc": "4124254124",
                   "dtll_bar_num_doc": "4214141533"
                 }
