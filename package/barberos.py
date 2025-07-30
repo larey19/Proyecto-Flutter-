@@ -50,7 +50,7 @@ def POSTbarberos():
         if sql: 
             return jsonify({"mensaje" : "Ya existe un barbero registrado con ese ID"}),409
         cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-        cursor.execute("INSERT INTO t_barbero (bar_id, bar_salario, bar_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_barbero ON usu_num_doc = usu_id WHERE usu_num_doc = %s", (bar_id, bar_salario, usu_num_doc,)) #realiazamos consulta sql
+        cursor.execute("INSERT INTO t_barbero (bar_id, bar_salario, bar_usu_id) SELECT %s, %s FROM t_usuario LEFT JOIN t_barbero ON usu_num_doc = usu_id WHERE usu_num_doc = %s", (bar_id, bar_salario, usu_num_doc,)) #realiazamos consulta sql
         cursor = current_app.mysql.connection.cursor() #hacemos conexion
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el barbero"}),200
