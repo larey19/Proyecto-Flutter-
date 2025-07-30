@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
+import uuid
 clientes_bp = Blueprint('clientes', __name__)
 
 # Ruta Para Obtener todos los clientes Registrados en la base de datos 
@@ -34,6 +35,7 @@ def POSTcliente():
     if data is None:
         return jsonify({"error": "Error en la formacion del JSON"}), 400
     if 'usu_num_doc' in request.json:
+        cli_id = uuid.uuid4()
         usu_num_doc = request.json["usu_num_doc"]
         cursor = current_app.mysql.connection.cursor()
         cursor.execute("SELECT usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
@@ -46,7 +48,7 @@ def POSTcliente():
             return jsonify({"mensaje" : "Ya existe un Cliente registrado con ese ID"}),409
         
         cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-        cursor.execute("INSERT INTO t_cliente (cli_usu_id) SELECT usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (usu_num_doc,)) #realiazamos consulta sql
+        cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, usu_num_doc,)) #realiazamos consulta sql
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el cliente"}),200
     else:
