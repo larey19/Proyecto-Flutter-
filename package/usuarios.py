@@ -53,7 +53,7 @@ def POSTusuario():
     DatosFaltantes = [ x for x in requerido              if x not in peticion                    or not str(peticion[x]).strip()]
     if len(DatosFaltantes)>0: 
         return jsonify({"mensaje": f"Faltan campos en la peticion {DatosFaltantes}"}),400
-
+    id                  = uuid.uuid4()
     nombre              = peticion["usu_nombre"]
     apellido            = peticion["usu_apellido"]
     telefono            = peticion["usu_telefono"]
@@ -86,7 +86,7 @@ def POSTusuario():
     
     #si cumple con las validaciones Insertamos el Nuevo Usuario
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("INSERT INTO t_usuario (usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero))
+        cursor.execute("INSERT INTO t_usuario (usu_id ,usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el Usuario"}), 200
 
