@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
+import uuid
 barberos_bp = Blueprint('barberos', __name__)
 
 # Ruta Para Obtener todos los barberos Registrados en la base de datos 
