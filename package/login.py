@@ -31,7 +31,7 @@ def login_flutter():
             token = jwt.encode({
                 'usuario_id': user[0],
                 'nombre': user[1],
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+                # 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
             }, current_app.config['SECRET_KEY'], algorithm='HS256')
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {user[1]}",
