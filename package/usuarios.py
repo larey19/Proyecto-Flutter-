@@ -108,7 +108,7 @@ def PUTusuario(usu_num_doc):
             "usu_tipo_doc", 
             "usu_num_doc" ,
             "usu_usuario" ,
-            "usu_contrasena", 
+            # "usu_contrasena", 
             "usu_estado", 
             "usu_genero"]
     peticion            = request.json  
@@ -122,7 +122,7 @@ def PUTusuario(usu_num_doc):
     tipo_doc            = peticion["usu_tipo_doc"]
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
-    contraseña          = generate_password_hash(peticion["usu_contrasena"])
+    # contraseña          = generate_password_hash(peticion["usu_contrasena"])
     estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
@@ -151,7 +151,7 @@ def PUTusuario(usu_num_doc):
     
     #Realizamos la actualizacion de los datos del usuario (MENOS DE LOS CAMPOS USU_ESTADO y USU_ID)
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_contrasena=%s, usu_genero=%s WHERE usu_num_doc = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña,  genero, usu_num_doc))
+    cursor.execute("UPDATE t_usuario SET usu_nombre = %s, usu_apellido=%s, usu_telefono=%s, usu_correo=%s, usu_tipo_doc=%s, usu_num_doc=%s, usu_usuario=%s, usu_genero=%s WHERE usu_num_doc = %s", (nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, genero, usu_num_doc))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
