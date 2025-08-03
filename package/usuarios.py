@@ -71,6 +71,12 @@ def POSTusuario():
     
     #Realizamos Validaciones antes de crear un nuevo registro
     cursor = current_app.mysql.connection.cursor()
+    cursor.execute("SELECT usu_usuario FROM t_usuario WHERE usu_usuario = %s", (usuario,))
+    sql = cursor.fetchone()
+    if sql: 
+        return jsonify({"mensaje" : "Ya existe un registro con ese usuario"}), 409
+        
+    cursor = current_app.mysql.connection.cursor()
     cursor.execute("SELECT usu_correo FROM t_usuario WHERE usu_correo = %s", (correo,))
     sql = cursor.fetchone()
     if sql: 
@@ -132,6 +138,11 @@ def PUTusuario(usu_num_doc):
     sql = cursor.fetchone()
     if not sql: 
         return jsonify({"mensaje" : "Parece que intentas actualizar un registro que NO existe"}), 404
+    cursor = current_app.mysql.connection.cursor()
+    cursor.execute("SELECT usu_usuario, usu_num_doc FROM t_usuario WHERE usu_usuario = %s AND usu_num_doc != %s", (usuario, usu_num_doc,))
+    sql = cursor.fetchone()
+    if sql: 
+        return jsonify({"mensaje" : "No puedes utilizar ese usuario porque ya esta asociado a un registro"}), 409
     cursor = current_app.mysql.connection.cursor()
     cursor.execute("SELECT usu_correo, usu_num_doc FROM t_usuario WHERE usu_correo = %s AND usu_num_doc != %s", (correo, usu_num_doc,))
     sql = cursor.fetchone()
