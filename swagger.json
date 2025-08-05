@@ -311,7 +311,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contrasena', 'usu_estado', 'usu_genero'"],
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_estado', 'usu_genero'"],
                 "properties": {
                   "usu_nombre"    : { "type": "string" },
                   "usu_apellido"  : { "type": "string" },
@@ -320,7 +320,6 @@
                   "usu_tipo_doc"  : { "type": "string" },
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
-                  "usu_contrasena": { "type": "string" },
                   "usu_estado"    : { "type": "string" },
                   "usu_genero"    : { "type": "string" }
                 },
@@ -329,7 +328,6 @@
                   "usu_correo": "val@example.com",
                   "usu_estado": "activo",
                   "usu_genero": "Femenino",
-                  "usu_id": "d2fa722a-5509-4ee4-8853-0aacd615b",
                   "usu_nombre": "vale",
                   "usu_num_doc": "1044133189",
                   "usu_telefono": "3224000765",
@@ -478,7 +476,6 @@
       }
     },
     
-
     "/obtenerBarberos": {
       "get": {
         "security":[{
@@ -504,7 +501,6 @@
                   "usu_tipo_doc"  : { "type": "string" },
                   "usu_num_doc"   : { "type": "string" }, 
                   "usu_usuario"   : { "type": "string" },
-                  "usu_contrasena": { "type": "string" },
                   "usu_estado"    : { "type": "string" },
                   "usu_genero"    : { "type": "string" }
                   
@@ -574,18 +570,16 @@
         },
         "responses": {
           "200": {
-            "description": "Devuelve un mensaje indicando que el usuario fue registrado correctamente.",
+            "description": "Devuelve un mensaje indicando que el barbero fue registrado correctamente.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "properties": {
-                    "bar_salario" : { "type": "string" }, 
-                    "usu_num_doc"  : { "type": "string" }
+                    "mensaje" : { "type": "string" }
                   },
                   "example" : {
-                    "bar_salario": "1500000",
-                    "usu_num_doc": "1044133189"
+                    "mensaje": "Se ha registrado el barbero"
                   }
                 }
               }
@@ -648,7 +642,6 @@
                     "properties": {
                     "cli_id"        : { "type": "string" },
                     "usu_apellido"  : { "type": "string" },
-                    "usu_contrasena": { "type": "string" },
                     "usu_correo"    : { "type": "string" },
                     "usu_estado"    : { "type": "string" },
                     "usu_genero"    : { "type": "string" },
@@ -661,7 +654,6 @@
                     "example" : {
                       "cli_id": "d2fa722a-5509-4ee4-8853-0aacd615b1",
                       "usu_apellido": "Gómez",
-                      "usu_contrasena": "securepass456",
                       "usu_correo": "laura.gomez@example.com",
                       "usu_estado": "activo",
                       "usu_genero": "Femenino",
@@ -730,7 +722,7 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "usu_num_doc" : { "type": "string" }
+                      "mensaje" : { "type": "string" }
                     },
                     "example" : {
                       "mensaje": "Se ha registrado el cliente"
@@ -812,7 +804,7 @@
             }
           },
           "404": {
-            "description": "error de servicio inexistente.",
+            "description": "alerta de servicios inexistentes.",
             "content": {
               "application/json": {
                 "schema": {
@@ -933,7 +925,7 @@
         },
         "responses": {
           "200": {
-            "description": "Devuelve un mensaje indicando que el Servicio editado exitosamente.",
+            "description": "Devuelve un mensaje indicando que el Servicio fue editado exitosamente.",
             "content": {
               "application/json": {
                 "schema": {
@@ -987,20 +979,26 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "dtll_id":       { "type": "string" },
-                      "serv_tipo":     { "type": "string" },
-                      "serv_precio":   { "type": "string" },
-                      "cli_nombre":    { "type": "string" },
-                      "cli_apellido":  { "type": "string" },
-                      "bar_nombre":    { "type": "string" },
-                      "bar_apellido":  { "type": "string" }
+                      "dtll_id":          { "type": "string" },
+                      "dtll_serv_id" :    { "type" : "string" },
+                      "serv_tipo":        { "type": "string" },
+                      "serv_precio":      { "type": "string" },
+                      "dtll_cli_num_doc": { "type" : "string" },
+                      "cli_nombre":       { "type": "string" },
+                      "cli_apellido":     { "type": "string" },
+                      "dtll_bar_num_doc": { "type" : "string" },
+                      "bar_nombre":       { "type": "string" },
+                      "bar_apellido":     { "type": "string" }
                     },
                     "example": {
                       "dtll_id": "d2fa722a-5509-4ee4-8853-0cd615bc1c",
+                      "dtll_serv_id" : "d2fa722a-5509-4ee4-8853-0cd615bc1c",
                       "serv_tipo": "corte + barba",
                       "serv_precio": "20000",
+                      "dtll_cli_num_doc": "1257890876",
                       "cli_nombre": "Carlos",
                       "cli_apellido": "Pérez",
+                      "dtll_bar_num_doc": "125543467",
                       "bar_nombre": "Luis",
                       "bar_apellido": "Gómez"
                     }
@@ -1010,7 +1008,7 @@
             }
           },
           "404": {
-            "description": "No se encontraron detalles de servicio.",
+            "description": "alerta que no se encontraron detalles de servicio.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1180,7 +1178,7 @@
             }
           },
           "404": {
-            "description": "ID no encontrado.",
+            "description": "alerta de detalle de servicio no encontrado.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1201,3 +1199,4 @@
   }
 }
     
+
