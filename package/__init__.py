@@ -6,9 +6,9 @@ from .detalle_servicio import detal_servicios_bp
 from .documentacion import documentacion_bp
 from .reservas import reservas_bp
 from .login import login_bp
+from .login_clientes import login_clientes_bp
 
 def routes(app):
-
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(clientes_bp)
     app.register_blueprint(barberos_bp)
@@ -16,4 +16,5 @@ def routes(app):
     app.register_blueprint(reservas_bp)
     app.register_blueprint(detal_servicios_bp)
     app.register_blueprint(login_bp)
+    app.register_blueprint(login_clientes_bp)
     app.register_blueprint(documentacion_bp)
