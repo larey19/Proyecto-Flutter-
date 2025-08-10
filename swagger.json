@@ -26,7 +26,7 @@
   "tags":[
     {
     "name": "LogIn",
-    "description": "Siendo el primer paso para acceder a cada sesion de esta API."
+    "description": "El primer paso para acceder a cada funcion de esta API."
     },
     {
     "name": "Usuario",
@@ -43,6 +43,14 @@
     {
     "name": "Servicio",
     "description": "Todo sobre la gestión de Servicios"
+    },
+    {
+    "name": "Reservas",
+    "description": "Aqui podras Realizar la Reserva de un servicio"
+    },
+    {
+    "name": "DetalleServicio",
+    "description": "Todos los Detalles de los Servicios"
     }
   ],
 
@@ -1195,8 +1203,169 @@
           }
         }
       }
+    },
+
+      "/obtenerReservas": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["Reservas"],
+        "summary": "Listar todas las Reservas registradas.",
+        "description": "Este endpoint permite obtener un listado de las reservas realizadas en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de todas las reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "res_id": { "type": "string" },
+                      "res_fecha": { "type": "string" },
+                      "res_hora": { "type": "string" },
+                      "res_estado": { "type": "string" },
+                      "res_descripcion": { "type": "string" },
+                      "res_serv_id": { "type": "string" },
+                      "res_serv_tipo": { "type": "string" },
+                      "res_serv_precio": { "type": "string" },
+                      "res_bar_num_doc": { "type": "string" },
+                      "res_bar_nombre": { "type": "string" },
+                      "res_bar_apellido": { "type": "string" },
+                      "res_cli_num_doc": { "type": "string" },
+                      "res_cli_nombre": { "type": "string" },
+                      "res_cli_apellido": { "type": "string" }
+                    },
+                    "example": {
+                    "res_bar_apellido": "Perez",
+                    "res_bar_nombre": "Carlos",
+                    "res_bar_num_doc": "122345447",
+                    "res_cli_apellido": "Perez",
+                    "res_cli_nombre": "Carlos",
+                    "res_cli_num_doc": "122345447",
+                    "res_estado": "confirmada",
+                    "res_descripcion": "Llegare 5 min tarde.",
+                    "res_fecha": "2025-08-11",
+                    "res_hora": "18:30:00",
+                    "res_id": "5cc5d4d3-ba0b-4538-b299-e3d6508e9e28",
+                    "res_serv_id": "5cc5d4d3-ba0b-4538-b299-e3d6508e9e28",
+                    "res_serv_precio": "5500",
+                    "res_serv_tipo": "patillas y bigote"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "alerta que no se encontró ninguna reserva",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ninguna reserva obtenida"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/registrarReserva": {
+      "post": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["Reservas"],
+        "summary": "Registrar una Nueva Reserva",
+        "description": "Este endpoint permite realizar una reserva. Requiere enviar un objeto JSON con los campos res_fecha, res_hora, res_serv_id, res_bar_num_doc, res_cli_num_doc,res_descripcion (opcional)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["res_fecha, res_hora, res_serv_id, res_estado, res_bar_num_doc y res_cli_num_doc"],
+                "properties": {
+                    "res_fecha": { "type": "string" },
+                    "res_hora": { "type": "string" },
+                    "res_estado": { "type": "string" },
+                    "res_descripcion": { "type": "string" },
+                    "res_serv_id": { "type": "string" },
+                    "res_bar_num_doc": { "type": "string" },
+                    "res_cli_num_doc": { "type": "string" }
+                },
+                "example": {
+                  "res_bar_num_doc": "122345447",
+                  "res_cli_num_doc": "122345447",
+                  "res_estado": "confirmada",
+                  "res_descripcion": "Llegare 5 min tarde. (opcional)",
+                  "res_fecha": "2025-08-11",
+                  "res_hora": "18:30:00",
+                  "res_serv_id": "5cc5d4d3-ba0b-4538-b299-e3d6508e9e28"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reserva Realizada exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Se ha realizado la reserva, Se envio la iformacion detallada a su correo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos faltantes o vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID de servicio, o barbero no encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Uy, parece que no hay ningún barbero con ese ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
-    
-
