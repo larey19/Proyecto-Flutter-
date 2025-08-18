@@ -1292,11 +1292,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["res_fecha, res_hora, res_serv_id, res_estado, res_bar_num_doc y res_cli_num_doc"],
+                "required": ["res_fecha, res_hora, res_serv_id, res_bar_num_doc y res_cli_num_doc"],
                 "properties": {
                     "res_fecha": { "type": "string" },
                     "res_hora": { "type": "string" },
-                    "res_estado": { "type": "string" },
                     "res_descripcion": { "type": "string" },
                     "res_serv_id": { "type": "string" },
                     "res_bar_num_doc": { "type": "string" },
@@ -1305,7 +1304,6 @@
                 "example": {
                   "res_bar_num_doc": "122345447",
                   "res_cli_num_doc": "122345447",
-                  "res_estado": "confirmada",
                   "res_descripcion": "Llegare 5 min tarde. (opcional)",
                   "res_fecha": "2025-08-11",
                   "res_hora": "18:30:00",
@@ -1363,9 +1361,26 @@
                 }
               }
             }
+          }, 
+          "422": {
+            "description": "Error de ingreso de una fecha antigua",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "No puede ingresar una fecha antigua"
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   }
 }
+
