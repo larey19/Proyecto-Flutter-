@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
 import uuid
+from .smtp import enviar_email
 clientes_bp = Blueprint('clientes', __name__)
 
 # Ruta Para Obtener todos los clientes Registrados en la base de datos 
@@ -47,7 +48,69 @@ def POSTcliente():
         if sql: 
             return jsonify({"mensaje" : "Ya existe un Cliente registrado con ese ID"}),409
         
-        cursor = current_app.mysql.connection.cursor() #hacemos la conexion
+        cursor.execute("SELECT usu_correo, usu_nombre FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
+        destino = cursor.fetchone()
+        enviar_email(destino[0], "Registrado Exitoso", f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+        * {{
+            font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+        }}
+        .email {{
+            margin: auto;
+            max-width: 500px;
+            padding: 5%;
+            background-color: rgba(240, 248, 255, 0.377);
+        }}
+        h4 {{
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #444;
+        }}
+        h6{{
+            margin: 0px auto 15px;
+            color : #555;
+        }}
+        .cont_cent {{
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color : #555;
+        }}
+        .cont_inf {{
+            font-size: 0.7rem;
+            text-align: center;
+            color: #666;
+        }}
+        hr {{
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }}
+    </style>
+</head>
+
+<body>
+    <div class="email">
+        <h4>Bienvenido a Barber Blessed 👋</h4>
+        <h6>Hola, {destino[0]}</h6>
+        <div class="cont_cent">
+            <p>{destino[1]} es un placer para nosotros poder darte la bienvenida a nuestra familia, gracias por registrarte en nuestra aplicación móvil.</p>
+        </div>
+        <hr>
+        <div class="cont_inf">  
+            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+""")
+
         cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, usu_num_doc,)) #realiazamos consulta sql
         cursor.connection.commit()
         return jsonify({"mensaje":"Se ha registrado el cliente"}),200
