@@ -15,8 +15,8 @@ def GETreserva():
                     SELECT 
                         res.res_id, res.res_fecha, res.res_hora , res.res_estado, res.res_descripcion, 
                         serv.serv_id AS res_serv_id, serv.serv_tipo AS res_serv_tipo, serv.serv_precio AS res_serv_precio, 
-                        bar.usu_num_doc AS res_bar_num_doc, bar.usu_nombre AS res_bar_nombre, bar.usu_apellido res_bar_apellido,
-                        cli.usu_num_doc AS res_cli_num_doc, cli.usu_nombre AS res_cli_nombre, cli.usu_apellido res_cli_apellido 
+                        bar.usu_num_doc AS res_bar_num_doc, bar.usu_nombre AS res_bar_nombre, bar.usu_apellido AS res_bar_apellido,
+                        cli.usu_num_doc AS res_cli_num_doc, cli.usu_nombre AS res_cli_nombre, cli.usu_apellido AS res_cli_apellido, cli.usu_telefono AS res_cli_telefono 
                     FROM t_reserva res
                         JOIN t_barbero ON bar_id 	        = res_bar_id
                         JOIN t_usuario bar ON bar.usu_id    = bar_usu_id
@@ -42,6 +42,7 @@ def GETreserva():
             "res_cli_num_doc": res[11],
             "res_cli_nombre" : res[12],
             "res_cli_apellido" : res[13],
+            "res_cli_telefono" : res[14]
         })
     if len(sql) < 1:
         return jsonify({"mensaje" : "Ninguna reserva obtenida"}), 404
@@ -197,3 +198,4 @@ def POSTreserva():
         return jsonify({"mensaje":"Se ha realizado la reserva, Se envio la iformacion detallada a su correo"}), 200
     else:
         return jsonify({"mensaje":"Debe enviar toda la informacion solicitada"}), 400
+
