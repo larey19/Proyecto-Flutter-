@@ -65,6 +65,10 @@ def POSTreserva():
         time = datetime.now()
         if len(str(res_fecha).strip()) < 1 or len((res_hora).strip()) < 1 or len(str(res_serv_id).strip()) < 1 or len(str(res_bar_num_doc).strip()) < 1 or len(str(res_cli_num_doc).strip()) < 1:
             return jsonify({"mensaje" : "faltan campos por rellenar"}), 400
+        
+        if len(str(res_descripcion).strip()) == 0:
+            res_descripcion = "Ninguna"
+
 
         fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S")
         if time >= fch:
@@ -199,3 +203,174 @@ def POSTreserva():
     else:
         return jsonify({"mensaje":"Debe enviar toda la informacion solicitada"}), 400
 
+@reservas_bp.route("/editarEstado/<res_id>", methods = ["PUT"])
+def PUTreserva(res_id):
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    if "res_estado" in request.json:
+        res_estado = request.json["res_estado"]
+        cursor = current_app.mysql.connection.cursor() 
+        cursor.execute("SELECT * FROM t_reserva WHERE res_id = %s", (res_id,))
+        if not cursor.fetchone():
+            return jsonify({"mensaje" : "Uy, parece que no hay ninguna reserva con ese ID"}), 404
+        if len(str(res_estado).strip()) == 0:
+            return jsonify({"mensaje" : "Debe rellenar el campo"}), 400
+        if res_estado.lower() not in ["confirmada", "cancelada", "completada", "reprogramada"]:
+            return jsonify({"mensaje":"Esta digitando un valor de estado no admitido"}), 422
+        res_estado = res_estado.capitalize()
+        cursor.execute("UPDATE t_reserva SET res_estado = %s WHERE res_id = %s ", (res_estado ,res_id))
+        cursor.connection.commit()
+        cursor.execute("""
+                    SELECT 
+                        serv.serv_tipo,
+                        cli.usu_nombre, cli.usu_apellido, cli.usu_correo,
+                        res.res_fecha, res.res_hora
+                        FROM t_reserva res
+                        JOIN t_cliente ON cli_id            = res_cli_id
+                        JOIN t_usuario cli ON cli.usu_id    = cli_usu_id
+                        JOIN t_servicio serv ON serv_id     = res_serv_id
+                    WHERE res_id = %s
+                    """, (res_id,))
+        res = cursor.fetchone()
+        if res_estado == "Cancelada":
+            enviar_email(res[3], "Acabas de cancelar tu reserva", f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+        * {{
+            font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+        }}
+        .email {{
+            margin: auto;
+            max-width: 500px;
+            padding: 5%;
+            background-color: rgba(240, 248, 255, 0.377);
+        }}
+        h4 {{
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #444;
+        }}
+        h6{{
+            margin: 0px auto 15px;
+            color : #555;
+        }}
+        .cont_cent {{
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color : #555;
+            text-align: justify
+        }}
+        .cont_inf {{
+            font-size: 0.7rem;
+            text-align: center;
+            color: #666;
+        }}
+        hr {{
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }}
+    </style>
+</head>
+
+<body>
+    <div class="email">
+        <h4>Acabas de cancelar tu reserva!</h4>
+        <h6>Hola, {res[1]} {res[2]} 👋</h6>
+        <div class="cont_cent">
+            <p>{res[1]}, tu reserva del servicio {res[0]} para el dia {res[4]} ha sido cancelada exitosamente.  
+            </p>
+            <p>
+                Si lo deseas, puedes programar una nueva cita en cualquier momento desde nuestra aplicación.  
+                ¡Siempre será un placer atenderte!
+            </p>
+        </div>
+        <hr>
+        <div class="cont_inf">  
+            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+""")
+        if res_estado == "Reprogramada":
+            enviar_email(res[3], "Reprogramaste tu reserva!", f"""
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+        * {{
+            font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+        }}
+        .email {{
+            margin: auto;
+            max-width: 500px;
+            padding: 5%;
+            background-color: rgba(240, 248, 255, 0.377);
+        }}
+        h4 {{
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #444;
+        }}
+        h6 {{
+            margin: 0px auto 15px;
+            color: #555;
+        }}
+        .cont_cent {{
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #555;
+            text-align: justify;
+        }}
+        .cont_inf {{
+            font-size: 0.7rem;
+            text-align: center;
+            color: #666;
+        }}
+        hr {{
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }}
+    </style>
+</head>
+
+<body>
+    <div class="email">
+        <h4>¡Tu reserva ha sido reprogramada correctamente!</h4>
+        <h6>Hola, {res[1]} {res[2]} 👋</h6>
+        <div class="cont_cent">
+            <p>
+                Te confirmamos que tu reserva del servicio <strong>{res[0]}</strong> 
+                ha sido reprogramada exitosamente.
+            </p>
+            <p>
+                La nueva fecha y hora de tu cita es el <strong>{res[4]}</strong> a las <strong>{res[5]}</strong>.
+            </p>
+            <p>
+                ¡Gracias por confiar en nosotros! Te estaremos esperando con mucho gusto.
+            </p>
+        </div>
+        <hr>
+        <div class="cont_inf">  
+            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+""")
+        return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
+    else:
+        return jsonify({"mensaje":"Faltan campos en la peticion"})
