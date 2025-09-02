@@ -81,6 +81,7 @@ def POSTcliente():
             font-size: 0.9rem;
             line-height: 1.4;
             color : #555;
+            text-align: justify
         }}
         .cont_inf {{
             font-size: 0.7rem;
