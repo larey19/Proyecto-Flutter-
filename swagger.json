@@ -54,11 +54,12 @@
     }
   ],
 
+  
   "paths": {
     "/acceso": {
       "post": {
         "tags": ["LogIn"],
-        "summary": "Iniciar sesión de usuario",
+        "summary": "Iniciar sesión",
         "description": "Este endpoint permite a un usuario iniciar sesión. Retornando un token JWT el cual permitira acceder a todas las rutas de esta API.",
         "requestBody": {
           "required": true,
@@ -81,7 +82,25 @@
         },
         "responses": {
           "200": {
-            "description": "Inicio de sesión exitoso.",
+            "description": "Inicio de sesión exitoso administrador.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" },
+                    "token": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Sesión iniciada con éxito Carlos",
+                    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Inicio de sesión exitoso usuario.",
             "content": {
               "application/json": {
                 "schema": {
@@ -125,6 +144,111 @@
                   },
                   "example": {
                     "mensaje": "Ups, ese usuario parece estar incorrecto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },    
+    "/registro": {
+      "post": {
+        "tags":["LogIn"],
+        "summary": "Registrar un nuevo cliente",
+        "description": "Este endpoint permite registrar un nuevo cliente en el sistema. Requiere enviar un objeto JSON con los datos del usuarios como usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena y usu_genero.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["'usu_nombre', 'usu_apellido', 'usu_telefono', 'usu_correo', 'usu_tipo_doc', 'usu_num_doc', 'usu_usuario', 'usu_contrasena', 'usu_genero'"],
+                "properties": {
+                  "usu_nombre"    : { "type": "string" },
+                  "usu_apellido"  : { "type": "string" },
+                  "usu_telefono"  : { "type": "string" },
+                  "usu_correo"    : { "type": "string" },
+                  "usu_tipo_doc"  : { "type": "string" },
+                  "usu_num_doc"   : { "type": "string" }, 
+                  "usu_usuario"   : { "type": "string" },
+                  "usu_contrasena": { "type": "string" },
+                  "usu_genero"    : { "type": "string" }
+                },
+                "example": {
+                  "usu_nombre": "Mariana",
+                  "usu_apellido": "Torres",
+                  "usu_telefono": "3114455667",
+                  "usu_correo": "marianatorres@example.com",
+                  "usu_tipo_doc": "ti",
+                  "usu_num_doc": "122334455",
+                  "usu_usuario": "marianat",
+                  "usu_contrasena": "marianapass321",
+                  "usu_genero": "Femenino"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Devuelve un mensaje indicando que el cliente fue registrado correctamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Usuario Registrado"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "error de entrada duplicada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "ya existe un registro asociado con ese correo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos en la peticion."
+                  }
+                }
+              }
+            }
+          }, "422": {
+            "description": "error valores ingresados no permitidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Esta digitando un valor difente en el tipo de documento"
                   }
                 }
               }
@@ -289,6 +413,21 @@
                   },
                   "example": {
                     "mensaje": "Faltan campos en la peticion."
+                  }
+                }
+              }
+            }
+          }, "422": {
+            "description": "error valores ingresados no permitidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Esta digitando un valor difente en el tipo de documento"
                   }
                 }
               }
@@ -1236,7 +1375,8 @@
                       "res_bar_apellido": { "type": "string" },
                       "res_cli_num_doc": { "type": "string" },
                       "res_cli_nombre": { "type": "string" },
-                      "res_cli_apellido": { "type": "string" }
+                      "res_cli_apellido": { "type": "string" },
+                      "res_cli_telefono": { "type": "string" }
                     },
                     "example": {
                     "res_bar_apellido": "Perez",
@@ -1245,6 +1385,7 @@
                     "res_cli_apellido": "Perez",
                     "res_cli_nombre": "Carlos",
                     "res_cli_num_doc": "122345447",
+                    "res_cli_telefono": "300333003",
                     "res_estado": "confirmada",
                     "res_descripcion": "Llegare 5 min tarde.",
                     "res_fecha": "2025-08-11",
@@ -1292,18 +1433,20 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["res_fecha, res_hora, res_serv_id, res_bar_num_doc y res_cli_num_doc"],
+                "required": ["res_fecha, res_hora, res_serv_id, res_estado, res_bar_num_doc y res_cli_num_doc"],
                 "properties": {
                     "res_fecha": { "type": "string" },
                     "res_hora": { "type": "string" },
+                    "res_estado": { "type": "string" },
                     "res_descripcion": { "type": "string" },
                     "res_serv_id": { "type": "string" },
                     "res_bar_num_doc": { "type": "string" },
                     "res_cli_num_doc": { "type": "string" }
-                },
+                },  
                 "example": {
                   "res_bar_num_doc": "122345447",
                   "res_cli_num_doc": "122345447",
+                  "res_estado": "confirmada",
                   "res_descripcion": "Llegare 5 min tarde. (opcional)",
                   "res_fecha": "2025-08-11",
                   "res_hora": "18:30:00",
@@ -1361,8 +1504,7 @@
                 }
               }
             }
-          }, 
-          "422": {
+          },"422": {
             "description": "Error de ingreso de una fecha antigua",
             "content": {
               "application/json": {
@@ -1383,4 +1525,3 @@
     }
   }
 }
-
