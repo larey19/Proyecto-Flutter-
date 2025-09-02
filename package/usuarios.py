@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app, session
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from .auth import token
 import uuid
@@ -28,7 +28,7 @@ def GETusuarios():
     if len(USUARIOS) < 1:
         return jsonify({"mensaje" : "Ningun Registro Obtenido"}), 404
     return jsonify(USUARIOS), 200
-
+    
 # Ruta Para Registrar un usuario en la base de datos 
 @usuarios_bp.route("/registrarUsuario", methods=["POST", "GET"])
 @token
@@ -46,7 +46,6 @@ def POSTusuario():
             "usu_num_doc" ,
             "usu_usuario" ,
             "usu_contrasena", 
-            "usu_estado", 
             "usu_genero"]
     # creamos una variable con la que podemos exigir a una CLAVE estar en la la Peticion al servidor 
     peticion            = request.json 
@@ -66,7 +65,7 @@ def POSTusuario():
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
     contraseña          = generate_password_hash(peticion["usu_contrasena"])
-    estado              = peticion["usu_estado"]
+    # # estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
     #Realizamos Validaciones antes de crear un nuevo registro
@@ -88,15 +87,12 @@ def POSTusuario():
     if sql: 
         return jsonify({"mensaje" : "Ya existe un registro asociado con ese numero de identificacion"}), 409
 
-    if estado.lower() not in ['activo', 'inactivo']:
-        return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
-    
     if tipo_doc.lower() not in ['cc', 'ti', 'ce', 'otro']:
-        return jsonify({"mensaje" : "Esta digitando un tipo de documento desconocido"})
+        return jsonify({"mensaje" : "Esta digitando un tipo de documento desconocido"}), 422
     
     #si cumple con las validaciones Insertamos el Nuevo Usuario
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("INSERT INTO t_usuario (usu_id ,usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, estado, genero))
+    cursor.execute("INSERT INTO t_usuario (usu_id ,usu_nombre, usu_apellido, usu_telefono, usu_correo, usu_tipo_doc, usu_num_doc, usu_usuario, usu_contrasena, usu_estado, usu_genero) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, nombre, apellido, telefono, correo, tipo_doc, num_doc, usuario, contraseña, "activo", genero))
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el Usuario"}), 200
 
