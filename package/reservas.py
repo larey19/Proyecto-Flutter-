@@ -48,6 +48,48 @@ def GETreserva():
         return jsonify({"mensaje" : "Ninguna reserva obtenida"}), 404
     return jsonify(RESERVAS), 200
 
+@reservas_bp.route("/obtenerReservas/<res_cli_num_doc>")
+@token
+def GETreservaCli(res_cli_num_doc):
+    cursor = current_app.mysql.connection.cursor()
+    cursor.execute("""
+                    SELECT 
+                        res.res_id, res.res_fecha, res.res_hora , res.res_estado, res.res_descripcion, 
+                        serv.serv_id AS res_serv_id, serv.serv_tipo AS res_serv_tipo, serv.serv_precio AS res_serv_precio, 
+                        bar.usu_num_doc AS res_bar_num_doc, bar.usu_nombre AS res_bar_nombre, bar.usu_apellido AS res_bar_apellido,
+                        cli.usu_num_doc AS res_cli_num_doc, cli.usu_nombre AS res_cli_nombre, cli.usu_apellido AS res_cli_apellido, cli.usu_telefono AS res_cli_telefono 
+                    FROM t_reserva res
+                        JOIN t_barbero ON bar_id 	        = res_bar_id
+                        JOIN t_usuario bar ON bar.usu_id    = bar_usu_id
+                        JOIN t_cliente ON cli_id            = res_cli_id
+                        JOIN t_usuario cli ON cli.usu_id    = cli_usu_id
+                        JOIN t_servicio serv ON serv_id     = res_serv_id
+                    WHERE cli.usu_num_doc = %s
+                    """, [res_cli_num_doc])
+    sql = cursor.fetchall()
+    RESERVAS = []
+    for res in sql:
+        RESERVAS.append({
+            "res_id" : res[0],
+            "res_fecha" : str(res[1]),
+            "res_hora" : str(res[2]),
+            "res_estado" : res[3],
+            "res_descripcion" : res[4],
+            "res_serv_id" : res[5],
+            "res_serv_tipo": res[6],
+            "res_serv_precio": res[7],
+            "res_bar_num_doc": res[8],
+            "res_bar_nombre" : res[9],
+            "res_bar_apellido" : res[10],
+            "res_cli_num_doc": res[11],
+            "res_cli_nombre" : res[12],
+            "res_cli_apellido" : res[13],
+            "res_cli_telefono" : res[14]
+        })
+    if len(sql) < 1:
+        return jsonify({"mensaje" : "Aun no has realizado ninguna reserva?\n La puedes realizar ya mismo!"}), 404
+    return jsonify(RESERVAS), 200
+
 @reservas_bp.route("/registrarReserva", methods = ["POST"])
 @token
 def POSTreserva():
@@ -374,3 +416,4 @@ def PUTreserva(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
