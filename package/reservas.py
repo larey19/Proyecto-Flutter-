@@ -48,7 +48,7 @@ def GETreserva():
         return jsonify({"mensaje" : "Ninguna reserva obtenida"}), 404
     return jsonify(RESERVAS), 200
 
-@reservas_bp.route("/obtenerReservas/<res_cli_num_doc>")
+@reservas_bp.route("/obtenerReservas/<res_cli_num_doc>", methods = ["POST"])
 @token
 def GETreservaCli(res_cli_num_doc):
     cursor = current_app.mysql.connection.cursor()
@@ -416,4 +416,5 @@ def PUTreserva(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
 
