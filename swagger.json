@@ -1343,8 +1343,7 @@
         }
       }
     },
-
-      "/obtenerReservas": {
+    "/obtenerReservas/{res_cli_num_doc}": {
       "get": {
         "security":[{
           "bearerAuth" : []
@@ -1352,6 +1351,14 @@
         "tags": ["Reservas"],
         "summary": "Listar todas las Reservas registradas.",
         "description": "Este endpoint permite obtener un listado de las reservas realizadas en el sistema.",
+        "parameters": [
+          {
+            "name": "res_cli_num_doc",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Respuesta exitosa que contiene la lista de todas las reservas",
@@ -1410,7 +1417,7 @@
                     "mensaje": { "type": "string" }
                   },
                   "example": {
-                    "mensaje": "Ninguna reserva obtenida"
+                    "mensaje": "Aun no has realizado ninguna reserva? La puedes realizar ya mismo!"
                   }
                 }
               }
@@ -1525,3 +1532,4 @@
     }
   }
 }
+
