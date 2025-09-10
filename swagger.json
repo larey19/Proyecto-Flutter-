@@ -1343,7 +1343,83 @@
         }
       }
     },
-    "/obtenerReservas/{res_cli_num_doc}": {
+    
+      "/obtenerReservas": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["Reservas"],
+        "summary": "Listar todas las Reservas registradas.",
+        "description": "Este endpoint permite obtener un listado de las reservas realizadas en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la lista de todas las reservas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "res_id": { "type": "string" },
+                      "res_fecha": { "type": "string" },
+                      "res_hora": { "type": "string" },
+                      "res_estado": { "type": "string" },
+                      "res_descripcion": { "type": "string" },
+                      "res_serv_id": { "type": "string" },
+                      "res_serv_tipo": { "type": "string" },
+                      "res_serv_precio": { "type": "string" },
+                      "res_bar_num_doc": { "type": "string" },
+                      "res_bar_nombre": { "type": "string" },
+                      "res_bar_apellido": { "type": "string" },
+                      "res_cli_num_doc": { "type": "string" },
+                      "res_cli_nombre": { "type": "string" },
+                      "res_cli_apellido": { "type": "string" },
+                      "res_cli_telefono": { "type": "string" }
+                    },
+                    "example": {
+                    "res_bar_apellido": "Perez",
+                    "res_bar_nombre": "Carlos",
+                    "res_bar_num_doc": "122345447",
+                    "res_cli_apellido": "Perez",
+                    "res_cli_nombre": "Carlos",
+                    "res_cli_num_doc": "122345447",
+                    "res_cli_telefono": "300333003",
+                    "res_estado": "confirmada",
+                    "res_descripcion": "Llegare 5 min tarde.",
+                    "res_fecha": "2025-08-11",
+                    "res_hora": "18:30:00",
+                    "res_id": "5cc5d4d3-ba0b-4538-b299-e3d6508e9e28",
+                    "res_serv_id": "5cc5d4d3-ba0b-4538-b299-e3d6508e9e28",
+                    "res_serv_precio": "5500",
+                    "res_serv_tipo": "patillas y bigote"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "alerta que no se encontró ninguna reserva",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ninguna reserva obtenida"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+      "/obtenerReservas/{res_cli_num_doc}": {
       "get": {
         "security":[{
           "bearerAuth" : []
@@ -1532,4 +1608,3 @@
     }
   }
 }
-
