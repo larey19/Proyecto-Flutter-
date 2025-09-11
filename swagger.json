@@ -54,7 +54,7 @@
     }
   ],
 
-  
+
   "paths": {
     "/acceso": {
       "post": {
@@ -258,6 +258,7 @@
       }
     },
 
+    
     "/obtenerUsuarios": {
       "get": {
         "security":[{
@@ -325,7 +326,81 @@
         }
       }
     },
-
+    "/obtenerUsuario/{usu_num_doc}": {
+      "get": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags":["Usuario"],
+        "summary": "Listar la informacion de un Usuario",
+        "description":"Este endpoint permite obtener un listado completo de la informacion de un usuario registrado en el sistema.",
+        "parameters": [
+          {
+            "name": "usu_num_doc",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta exitosa que contiene la informacion de un usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "usu_id"        : { "type": "string" },
+                      "usu_nombre"    : { "type": "string" },
+                      "usu_apellido"  : { "type": "string" },
+                      "usu_telefono"  : { "type": "string" },
+                      "usu_correo"    : { "type": "string" },
+                      "usu_tipo_doc"  : { "type": "string" },
+                      "usu_num_doc"   : { "type": "string" }, 
+                      "usu_usuario"   : { "type": "string" },
+                      "usu_contrasena": { "type": "string" },
+                      "usu_estado"    : { "type": "string" },
+                      "usu_genero"    : { "type": "string" }
+                    },
+                    "example": {
+                      "usu_id": "d2fa722a-5509-4ee4-8853-0aacd615",
+                      "usu_nombre": "Mariana",
+                      "usu_apellido": "Torres",
+                      "usu_telefono": "3114455667",
+                      "usu_correo": "marianatorres@example.com",
+                      "usu_tipo_doc": "ti",
+                      "usu_num_doc": "122334455",
+                      "usu_usuario": "marianat",
+                      "usu_contrasena": "marianapass321",
+                      "usu_estado": "activo",
+                      "usu_genero": "Femenino"
+                    }
+                  }
+                }
+              }
+            }
+          }, 
+          "404": {
+            "description": "alerta de usuarios inexistentes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Ningun usuario encontrado."
+                  }
+                }
+              }
+            }
+          }   
+        }
+      }
+    },
     "/registrarUsuario": {
       "post": {
         "security":[{
@@ -502,6 +577,22 @@
               }
             }
           },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "error de usuario inexistente.",
             "content": {
@@ -553,14 +644,14 @@
         }
       }
     },
-    "/cambiarEstado/{usu_num_doc}": {
+    "/editarContrasena/{usu_num_doc}": {
       "put": {
         "security":[{
           "bearerAuth" : []
         }],
         "tags":["Usuario"],
-        "summary": "TEMPORALMENTE NO DISPONIBLE",
-        "description":"Este endpoint permite editar el estado de un usuario del sistema utilizando su identificador único ID.",
+        "summary": "Permite Actualizar la contraseña",
+        "description":"Este endpoint permite editar la contraseña de un usuario del sistema",
         "parameters": [
           {
             "name": "usu_num_doc",
@@ -575,12 +666,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["'usu_estado'"],
+                "required": [
+                  "usu_contrasena",
+                  "usu_contrasena_new"],
                 "properties": {
-                  "usu_estado"    : { "type": "string" }
+                  "usu_contrasena"    : { "type": "string" },
+                  "usu_contrasena_new"    : { "type": "string" }
                 },
                 "example": {
-                  "usu_estado": "Inactivo"
+                  "usu_contrasena": "***",
+                  "usu_contrasena_new": "***"
                 }
               }
             }
@@ -588,7 +683,7 @@
         },
         "responses": {
           "200": {
-            "description": "Devuelve un mensaje indicando que el estado del usuario fue actualizado correctamente.",
+            "description": "Devuelve un mensaje indicando que la contrasena del usuario fue actualizado correctamente.",
             "content": {
               "application/json": {
                 "schema": {
@@ -597,7 +692,23 @@
                     "mensaje": { "type": "string" }
                   },
                   "example": {
-                    "mensaje": "Se ha cambiado el estado del usuario"
+                    "mensaje": "Se ha cambiado la contraseña correctamente"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "error de campos faltantes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
                   }
                 }
               }
@@ -914,9 +1025,6 @@
         }
       }
     },
-
-
-
 
     "/obtenerServicios": {
       "get": {
@@ -1343,7 +1451,7 @@
         }
       }
     },
-    
+
       "/obtenerReservas": {
       "get": {
         "security":[{
@@ -1425,7 +1533,7 @@
           "bearerAuth" : []
         }],
         "tags": ["Reservas"],
-        "summary": "Listar todas las Reservas registradas.",
+        "summary": "Listar todas las Reservas registradas de un usuario.",
         "description": "Este endpoint permite obtener un listado de las reservas realizadas en el sistema.",
         "parameters": [
           {
@@ -1502,7 +1610,7 @@
         }
       }
     },
-    "/registrarReserva": {
+      "/registrarReserva": {
       "post": {
         "security":[{
           "bearerAuth" : []
@@ -1520,7 +1628,6 @@
                 "properties": {
                     "res_fecha": { "type": "string" },
                     "res_hora": { "type": "string" },
-                    "res_estado": { "type": "string" },
                     "res_descripcion": { "type": "string" },
                     "res_serv_id": { "type": "string" },
                     "res_bar_num_doc": { "type": "string" },
@@ -1529,7 +1636,6 @@
                 "example": {
                   "res_bar_num_doc": "122345447",
                   "res_cli_num_doc": "122345447",
-                  "res_estado": "confirmada",
                   "res_descripcion": "Llegare 5 min tarde. (opcional)",
                   "res_fecha": "2025-08-11",
                   "res_hora": "18:30:00",
@@ -1587,7 +1693,8 @@
                 }
               }
             }
-          },"422": {
+          },
+          "422": {
             "description": "Error de ingreso de una fecha antigua",
             "content": {
               "application/json": {
@@ -1605,6 +1712,262 @@
           }
         }
       }
+    },
+      "/editarEstado/{res_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["Reservas"],
+        "summary": "Editar el estado de una Reserva",
+        "description": "Este endpoint permite realizar una actualizaciona al estado de una reserva. Requiere enviar un objeto JSON con el campos res_estado",
+        "parameters": [
+          {
+            "name": "res_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["res_estado"],
+                "properties": {
+                    "res_estado": { "type": "string" }
+                },  
+                "example": {
+                  "res_estado": "Completada"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reserva Editada Correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Depende del tipo de Estado la respuesta Variá."
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos faltantes o vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Edicion no autorizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "¡No se puede afectar el estado de una reserva completada!"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID de reserva no encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Uy, parece que no hay ninguna reserva con ese ID"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Seleccion del mismo estado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Esta Seleccionando el estado actual de la reserva"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de ingreso de un estado no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Esta digitando un valor de estado no admitido"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }, 
+      "/editarReserva/{res_id}": {
+      "put": {
+        "security":[{
+          "bearerAuth" : []
+        }],
+        "tags": ["Reservas"],
+        "summary": "Reprogramar una Reserva",
+        "description": "Este endpoint permite Reprogramar una Reserva. Requiere enviar un objeto JSON con los campos res_fecha, res_hora, res_descripcion (opcional)",
+        "parameters": [
+          {
+            "name": "res_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["res_fecha, res_hora"],
+                "properties": {
+                    "res_fecha": { "type": "string" },
+                    "res_hora": { "type": "string" },
+                    "res_descripcion": { "type": "string" }
+                },  
+                "example": {
+                  "res_descripcion": "me surgio un inconveniente (opcional)",
+                  "res_fecha": "2025-08-11",
+                  "res_hora": "18:30:00"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reserva Editada Correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Se ha Reprogramado la reserva con exito, Revise la bandeja de su correo"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos faltantes o vacíos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Faltan campos por rellenar"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Edicion no autorizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "¡No se puede afectar el estado de una reserva completada!"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ID de reserva no encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "Uy, parece que no hay ninguna reserva con ese ID"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error de ingreso de fecha antigua",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string" }
+                  },
+                  "example": {
+                    "mensaje": "No puede digitar una fecha Antigua"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
+
+
