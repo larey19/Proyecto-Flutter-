@@ -38,7 +38,7 @@ def login_flutter():
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {admin[1]}",
                 "token": token,
-                "usu_num_doc": user[6]
+                "usu_num_doc": admin[6]
                 
             }), 200
         elif user:
@@ -185,4 +185,5 @@ def registro():
     cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, num_doc,)) 
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el cliente"}),200
+
 
