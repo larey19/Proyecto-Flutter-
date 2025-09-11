@@ -7,7 +7,7 @@ usuarios_bp = Blueprint('usuarios', __name__)
 
 # Ruta Para Obtener todos los usuarios Registrados en la base de datos 
 @usuarios_bp.route("/obtenerUsuarios") 
-@token
+# @token
 def GETusuarios():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario") #Realizar consulta SQL
@@ -28,7 +28,30 @@ def GETusuarios():
     if len(USUARIOS) < 1:
         return jsonify({"mensaje" : "Ningun Registro Obtenido"}), 404
     return jsonify(USUARIOS), 200
-    
+
+# Ruta Para Obtener un usuario Registrados en la base de datos 
+@usuarios_bp.route("/obtenerUsuario/<usu_num_doc>") 
+@token
+def GETusuario(usu_num_doc):
+    cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
+    cursor.execute("SELECT * FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,)) #Realizar consulta SQL
+    usuario = cursor.fetchone()#obtener TODOS los resultados de la consulta
+    USUARIO = []
+    USUARIO.append({ #Creamos tipo Diccinario CLAVE : VALOR
+        "usu_id":usuario[0], #La clave tal cual como la tenemos en la base de datos "USU_ID" y el valor seran los indices [Posicion] de recorrer la consulta for ("USUARIO") in usuario
+        "usu_nombre":usuario[1] ,
+        "usu_apellido":usuario[2],
+        "usu_telefono":usuario[3], 
+        "usu_correo":usuario[4], 
+        "usu_tipo_doc":usuario[5], 
+        "usu_num_doc":usuario[6], 
+        "usu_usuario":usuario[7], 
+        "usu_estado":usuario[9], 
+        "usu_genero":usuario[10]})
+    if not usuario:
+        return jsonify({"mensaje" : "Ningun Usuario Encontrado"}), 404
+    return jsonify(USUARIO), 200
+
 # Ruta Para Registrar un usuario en la base de datos 
 @usuarios_bp.route("/registrarUsuario", methods=["POST", "GET"])
 @token
@@ -124,7 +147,6 @@ def PUTusuario(usu_num_doc):
     tipo_doc            = peticion["usu_tipo_doc"]
     num_doc             = peticion["usu_num_doc"]
     usuario             = peticion["usu_usuario"]
-    # contraseña          = generate_password_hash(peticion["usu_contrasena"])
     estado              = peticion["usu_estado"]
     genero              = peticion["usu_genero"]
     
@@ -162,23 +184,27 @@ def PUTusuario(usu_num_doc):
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
-#ruta para cambiar el estado de un usuario
-# @usuarios_bp.route("/cambiarEstado/<usu_id>", methods=["PUT"]) 
-# @token
-# def PUTestado(usu_id):
-#     data = request.get_json(silent=True)  
-#     if data is None:
-#         return jsonify({"error": "Error en la formacion del JSON"}), 400
-    
-#     cursor = current_app.mysql.connection.cursor() #hacemos la conexion
-#     cursor.execute("SELECT usu_id FROM t_usuario WHERE usu_id = %s", (usu_id,)) #realiazamos consulta sql
-#     sql = cursor.fetchone()#obtenemos un solo resultado
-#     if not sql: #si no hay resultado de la consulta retorna mensaje
-#         return jsonify({"mensaje" : "Parece que intentas actualizar el estado de un usuario que no existe"}), 404
-#     estado = request.json["usu_estado"] #creamos variable estado que contenga requerida la CLAVE "usu_estado" en la peticion
-#     if estado.lower() not in ['activo', 'inactivo']:
-#         return jsonify({"mensaje" : "Esta digitando un valor difente de estado"})
-#     cursor = current_app.mysql.connection.cursor() #hacemos conexion
-#     cursor.execute("UPDATE t_usuario SET usu_estado=%s WHERE usu_id = %s", (estado, usu_id)) #realizamos consulta sql
-#     cursor.connection.commit() # no me acuerdo pa que funciona esta
-#     return jsonify({"mensaje":"Se ha cambiado el estado del usuario"}), 200
+@usuarios_bp.route("/editarContrasena/<usu_num_doc>", methods=["PUT"])
+@token
+def PUTcontrasena(usu_num_doc):
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    if "usu_contrasena" in request.json and "usu_contrasena_new" in request.json:
+        usu_contrasena          = request.json["usu_contrasena"]
+        usu_contrasena_new      = generate_password_hash(request.json["usu_contrasena_new"])
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT usu_contrasena FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
+        usu_contrasena_old = cursor.fetchone()
+        if not usu_contrasena_old: 
+            return jsonify({"mensaje" : "Parece que intentas actualizar un registro que NO existe"}), 404
+        if len(str(usu_contrasena).strip()) == 0:
+            return jsonify({"mensaje":"no debe enviar informacion vacia"}), 404
+        if not check_password_hash(usu_contrasena_old[0],usu_contrasena):
+            return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
+        print("ok")
+        cursor.execute("UPDATE t_usuario SET usu_contrasena = %s WHERE usu_num_doc = %s", (usu_contrasena_new, usu_num_doc))
+        cursor.connection.commit()
+        return jsonify({"mensaje":"Se ha cambiado la contraseña correctamente"}), 200
+    else:
+        return jsonify({"mensaje":"Debe enviar toda la informacion"}), 400
