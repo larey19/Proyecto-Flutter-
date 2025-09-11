@@ -380,3 +380,113 @@ def PUTreserva(res_id):
 @reservas_bp.route("/editarEstado/<res_id>", methods = ["PUT"])
 @token
 def PUTreservaestado(res_id):
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    if "res_estado" in request.json:
+        dtll_id = uuid.uuid4()
+        res_estado = request.json["res_estado"]
+        cursor = current_app.mysql.connection.cursor() 
+        cursor.execute("SELECT res_estado, res_serv_id, res_bar_id, res_cli_id FROM t_reserva WHERE res_id = %s", (res_id,))
+        reserva = cursor.fetchone()
+        if not reserva:
+            return jsonify({"mensaje" : "Uy, parece que no hay ninguna reserva con ese ID"}), 404
+        if len(str(res_estado).strip()) == 0:
+            return jsonify({"mensaje" : "Debe seleccionar un estado"}), 400
+        if res_estado.lower() not in ["confirmada", "cancelada", "completada", "reprogramada"]:
+            return jsonify({"mensaje":"Esta digitando un valor de estado no admitido"}), 422
+        if reserva[0].lower() == "reprogramada":
+            return jsonify({"mensaje" : "Para reprogramar tu reserva correctamente, debes editarla por completo"}), 401
+        if reserva[0].lower() == "completada":
+            return jsonify({"mensaje" : "¡No se puede afectar el estado de una reserva completada!"}), 401
+        if reserva[0].lower() == res_estado.lower():
+            return jsonify({"mensaje":"Esta Seleccionando el estado actual de la reserva"}), 409
+        res_estado = res_estado.capitalize()
+        cursor.execute("UPDATE t_reserva SET res_estado = %s WHERE res_id = %s ", (res_estado ,res_id))
+        cursor.connection.commit()
+        cursor.execute("""
+                    SELECT 
+                        serv.serv_tipo,
+                        cli.usu_nombre, cli.usu_apellido, cli.usu_correo,
+                        res.res_fecha, res.res_hora
+                        FROM t_reserva res
+                        JOIN t_cliente ON cli_id            = res_cli_id
+                        JOIN t_usuario cli ON cli.usu_id    = cli_usu_id
+                        JOIN t_servicio serv ON serv_id     = res_serv_id
+                    WHERE res_id = %s
+                    """, (res_id,))
+        res = cursor.fetchone()
+        if res_estado == "Completada":
+            cursor.execute("INSERT INTO t_dtll_serv (dtll_id, dtll_serv_id, dtll_cli_id, dtll_bar_id) VALUES (%s, %s, %s, %s)", (dtll_id, reserva[1], reserva[3], reserva[2],))
+            cursor.connection.commit()
+            return jsonify({"mensaje": "La reserva se ha Completado con exito y se ha registrado toda la informacion en los detalles de servicios."}), 200
+        if res_estado == "Cancelada":
+            enviar_email(res[3], "Acabas de cancelar tu reserva", f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+        * {{
+            font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+        }}
+        .email {{
+            margin: auto;
+            max-width: 500px;
+            padding: 5%;
+            background-color: rgba(240, 248, 255, 0.377);
+        }}
+        h4 {{
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #444;
+        }}
+        h6{{
+            margin: 0px auto 15px;
+            color : #555;
+        }}
+        .cont_cent {{
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color : #555;
+            text-align: justify
+        }}
+        .cont_inf {{
+            font-size: 0.7rem;
+            text-align: center;
+            color: #666;
+        }}
+        hr {{
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }}
+    </style>
+</head>
+
+<body>
+    <div class="email">
+        <h4>Acabas de cancelar tu reserva!</h4>
+        <h6>Hola, {res[1]} {res[2]} 👋</h6>
+        <div class="cont_cent">
+            <p>{res[1]}, tu reserva del servicio {res[0]} para el dia {res[4]} ha sido cancelada exitosamente.  
+            </p>
+            <p>
+                Si lo deseas, puedes programar una nueva cita en cualquier momento desde nuestra aplicación.  
+                ¡Siempre será un placer atenderte!
+            </p>
+        </div>
+        <hr>
+        <div class="cont_inf">  
+            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+""")
+        return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
+    else:
+        return jsonify({"mensaje":"Faltan campos en la peticion"})
