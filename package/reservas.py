@@ -51,9 +51,13 @@ def GETreserva():
 @token
 def GETreservaCli(res_cli_num_doc):
     cursor = current_app.mysql.connection.cursor()
-    cli_num = cursor.execute("SELECT * FROM t_cliente JOIN t_usuario ON usu_id = cli_usu_id WHERE t_usuario.usu_num_doc = %s", (res_cli_num_doc,))
-    if not cli_num or len(str(cli_num).strip()) == 0:
-        return jsonify({"mensaje" : "Parece que ese usuario No existe"}), 404
+    cursor.execute("SELECT * FROM t_barbero JOIN t_usuario ON usu_id = bar_usu_id WHERE t_usuario.usu_num_doc = %s", (res_cli_num_doc,))
+    bar_num = cursor.fetchone()
+    if not bar_num:
+        cursor.execute("SELECT * FROM t_cliente JOIN t_usuario ON usu_id = cli_usu_id WHERE t_usuario.usu_num_doc = %s", (res_cli_num_doc,))
+        cli_num = cursor.fetchone()
+        if not cli_num:
+            return jsonify({"mensaje" : "Parece que ese usuario No existe"}), 404
     cursor.execute("""
                     SELECT 
                         res.res_id, res.res_fecha, res.res_hora , res.res_estado, res.res_descripcion, 
@@ -66,8 +70,8 @@ def GETreservaCli(res_cli_num_doc):
                         JOIN t_cliente ON cli_id            = res_cli_id
                         JOIN t_usuario cli ON cli.usu_id    = cli_usu_id
                         JOIN t_servicio serv ON serv_id     = res_serv_id
-                    WHERE cli.usu_num_doc = %s
-                    """, (res_cli_num_doc,))
+                    WHERE bar.usu_num_doc = %s or cli.usu_num_doc = %s
+                    """, (res_cli_num_doc, res_cli_num_doc,))
     sql = cursor.fetchall()
     RESERVAS = []
     for res in sql:
@@ -91,7 +95,7 @@ def GETreservaCli(res_cli_num_doc):
     if len(sql) < 1:
         return jsonify({"mensaje" : "Aun no has realizado ninguna reserva?\n La puedes realizar ya mismo!"}), 404
     return jsonify(RESERVAS), 200
-
+    
 @reservas_bp.route("/registrarReserva", methods = ["POST"])
 @token
 def POSTreserva():
@@ -490,4 +494,5 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
 
