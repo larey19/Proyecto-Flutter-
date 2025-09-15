@@ -397,8 +397,8 @@ def PUTreservaestado(res_id):
             return jsonify({"mensaje":"Esta digitando un valor de estado no admitido"}), 422
         if reserva[0].lower() == "reprogramada":
             return jsonify({"mensaje" : "Para reprogramar tu reserva correctamente, debes editarla por completo"}), 401
-        if reserva[0].lower() == "completada":
-            return jsonify({"mensaje" : "¡No se puede afectar el estado de una reserva completada!"}), 401
+        if reserva[0].lower() == "completada" or reserva[0].lower() == "cancelada":
+            return jsonify({"mensaje" : "¡No se puede Reprogramar esta Reserva porque su estado no lo permite!"}), 401
         if reserva[0].lower() == res_estado.lower():
             return jsonify({"mensaje":"Esta Seleccionando el estado actual de la reserva"}), 409
         res_estado = res_estado.capitalize()
@@ -490,3 +490,4 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
