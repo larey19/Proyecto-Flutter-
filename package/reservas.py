@@ -47,14 +47,14 @@ def GETreserva():
         return jsonify({"mensaje" : "Ninguna reserva obtenida"}), 404
     return jsonify(RESERVAS), 200
 
-@reservas_bp.route("/obtenerReservas/<res_cli_num_doc>")
+@reservas_bp.route("/obtenerReservas/<res_num_doc>")
 @token
-def GETreservaCli(res_cli_num_doc):
+def GETreservasUsuario(res_num_doc):
     cursor = current_app.mysql.connection.cursor()
-    cursor.execute("SELECT * FROM t_barbero JOIN t_usuario ON usu_id = bar_usu_id WHERE t_usuario.usu_num_doc = %s", (res_cli_num_doc,))
+    cursor.execute("SELECT * FROM t_barbero JOIN t_usuario ON usu_id = bar_usu_id WHERE t_usuario.usu_num_doc = %s", (res_num_doc,))
     bar_num = cursor.fetchone()
     if not bar_num:
-        cursor.execute("SELECT * FROM t_cliente JOIN t_usuario ON usu_id = cli_usu_id WHERE t_usuario.usu_num_doc = %s", (res_cli_num_doc,))
+        cursor.execute("SELECT * FROM t_cliente JOIN t_usuario ON usu_id = cli_usu_id WHERE t_usuario.usu_num_doc = %s", (res_num_doc,))
         cli_num = cursor.fetchone()
         if not cli_num:
             return jsonify({"mensaje" : "Parece que ese usuario No existe"}), 404
@@ -71,7 +71,7 @@ def GETreservaCli(res_cli_num_doc):
                         JOIN t_usuario cli ON cli.usu_id    = cli_usu_id
                         JOIN t_servicio serv ON serv_id     = res_serv_id
                     WHERE bar.usu_num_doc = %s or cli.usu_num_doc = %s
-                    """, (res_cli_num_doc, res_cli_num_doc,))
+                    """, (res_num_doc, res_num_doc,))
     sql = cursor.fetchall()
     RESERVAS = []
     for res in sql:
@@ -95,7 +95,7 @@ def GETreservaCli(res_cli_num_doc):
     if len(sql) < 1:
         return jsonify({"mensaje" : "Aun no has realizado ninguna reserva?\n La puedes realizar ya mismo!"}), 404
     return jsonify(RESERVAS), 200
-    
+
 @reservas_bp.route("/registrarReserva", methods = ["POST"])
 @token
 def POSTreserva():
@@ -110,16 +110,15 @@ def POSTreserva():
         res_bar_num_doc  = request.json["res_bar_num_doc"]
         res_cli_num_doc  = request.json["res_cli_num_doc"]
         res_id = uuid.uuid4()
-        time = datetime.now().replace(microsecond=0)
+        time = datetime.now().strftime("%Y-%m-%d %H:%M")
         if len(str(res_fecha).strip()) < 1 or len((res_hora).strip()) < 1 or len(str(res_serv_id).strip()) < 1 or len(str(res_bar_num_doc).strip()) < 1 or len(str(res_cli_num_doc).strip()) < 1:
             return jsonify({"mensaje" : "faltan campos por rellenar"}), 400
         
         if len(str(res_descripcion).strip()) == 0:
             res_descripcion = "Ninguna"
 
-
         try: 
-            fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S")
+            fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M")
         except ValueError:
             return jsonify({"mensaje": "Formato de fecha equivocado"}), 422 
 
@@ -228,7 +227,6 @@ def POSTreserva():
             {res[12]} Aquí tienes el resumen de tu reserva:
         </p>
         <div class="info">
-            <div class="item"><strong>ID Reserva:</strong> {res[0]}</div>
             <div class="item"><strong>Estado: </strong> {res[3]}</div>
             <div class="item"><strong>Fecha:</strong> {res[1]} </div>
             <div class="item"><strong>Hora:</strong> {res[2]} </div>
@@ -494,6 +492,3 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
-
-
-
