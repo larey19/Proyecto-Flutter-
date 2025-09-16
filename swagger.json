@@ -13,8 +13,8 @@
     "bearerAuth" : []
   },
   "info": {
-    "title": "Proyecto Flutter",
-    "description": "API para registrar, listar, y editar Barberos, Clientes, Usuarios y Servicios",
+    "title": "API Blessed Man",
+    "description": "Enfocada En La Eficiencia Y El Manejo De Informacion De Una Barberia.",
     "version": "1.0.0"
   },
 
@@ -1527,7 +1527,7 @@
         }
       }
     },
-      "/obtenerReservas/{res_cli_num_doc}": {
+          "/obtenerReservas/{res_num_doc}": {
       "get": {
         "security":[{
           "bearerAuth" : []
@@ -1537,7 +1537,7 @@
         "description": "Este endpoint permite obtener un listado de las reservas realizadas en el sistema.",
         "parameters": [
           {
-            "name": "res_cli_num_doc",
+            "name": "res_num_doc",
             "in": "path",
             "required": true,
             "schema": { "type": "string" }
@@ -1969,5 +1969,6 @@
     }
   }
 }
+
 
 
