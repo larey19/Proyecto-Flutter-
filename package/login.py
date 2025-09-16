@@ -6,6 +6,7 @@ import jwt
 
 login_bp = Blueprint('login', __name__)
 
+
 @login_bp.route("/acceso", methods=["POST"])
 def login_flutter():
     data = request.get_json(silent=True)  
@@ -21,13 +22,13 @@ def login_flutter():
         admin = cursor.fetchone() 
         if not admin:
             cursor.execute("SELECT t_usuario.* FROM t_barbero JOIN t_usuario ON usu_id = bar_usu_id WHERE usu_usuario = %s", (usuario,))
-            user = cursor.fetchone()
-            if not user:
+            barber = cursor.fetchone()
+            if not barber:
                 cursor.execute("SELECT t_usuario.* FROM t_cliente JOIN t_usuario ON usu_id = cli_usu_id WHERE usu_usuario = %s", (usuario,))
                 user = cursor.fetchone()
                 if not user:
                     return jsonify({"mensaje": "Si no estas registrado, recuerda que puedes hacerlo dando clic en el link aqui abajo!"}), 404
-        cursor.close()
+            cursor.close()
         if admin:
             contra_hash = admin[8]
             if not check_password_hash(contra_hash, contrasena):
@@ -37,11 +38,22 @@ def login_flutter():
             }, current_app.config['SECRET_KEY'], algorithm='HS256')
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {admin[1]}",
-                "token": token,
+                "token": token, 
                 "usu_num_doc": admin[6]
-                
             }), 200
-        elif user:
+        if barber:
+            contra_hash = barber[8]
+            if not check_password_hash(contra_hash, contrasena):
+                return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
+            token = jwt.encode({
+                'usuario_id': barber[0]
+            }, current_app.config['SECRET_KEY'], algorithm='HS256')
+            return jsonify({
+                "mensaje": f"Sesión iniciada con éxito {barber[1]}",
+                "token": token,
+                "usu_num_doc": barber[6]
+            }), 202
+        if user:
             contra_hash = user[8]
             if not check_password_hash(contra_hash, contrasena):
                 return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
@@ -51,7 +63,7 @@ def login_flutter():
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {user[1]}",
                 "token": token,
-                 "usu_num_doc": user[6] 
+                "usu_num_doc": user[6]
             }), 201
     return jsonify({"mensaje" : "Error faltan campos en la peticion"}), 404
 
@@ -185,5 +197,6 @@ def registro():
     cursor.execute("INSERT INTO t_cliente (cli_id, cli_usu_id) SELECT %s, usu_id FROM t_usuario LEFT JOIN t_cliente ON cli_usu_id = usu_id WHERE usu_num_doc = %s", (cli_id, num_doc,)) 
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el cliente"}),200
+
 
 
