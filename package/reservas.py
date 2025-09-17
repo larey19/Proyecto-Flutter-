@@ -284,7 +284,7 @@ def PUTreserva(res_id):
         try: 
             fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            return jsonify({"mensaje": "Formato de fecha equivocado"}), 422 
+            return jsonify({"mensaje": f"Formato de fecha equivocado, {fch} - {time}"}), 422 
 
         if time >= fch:
             return jsonify({"mensaje": "No puede digitar una fecha Antigua"}), 422 
@@ -492,3 +492,4 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
