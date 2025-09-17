@@ -124,7 +124,7 @@ def POSTreserva():
             return jsonify({"mensaje": "Formato de fecha equivocado"}), 422 
 
         if time >= fch:
-            return jsonify({"mensaje": f"No puede digitar una fecha Antigua {time} {fch}"}), 422 
+            return jsonify({"mensaje": "No puede digitar una fecha Antigua"}), 422 
 
         cursor = current_app.mysql.connection.cursor()       
         cursor.execute("SELECT * FROM t_servicio WHERE serv_id = %s", (res_serv_id,))
@@ -140,6 +140,16 @@ def POSTreserva():
         bar_id = cursor.fetchone()
         if not bar_id:
             return jsonify({"mensaje": "Uy, parece que no hay ningún barbero con ese ID"}), 404
+        
+        cursor.execute("""SELECT t_usuario.usu_num_doc, res_fecha, res_hora
+                        FROM t_reserva 
+                        JOIN t_barbero ON res_bar_id = bar_id
+                        JOIN t_usuario ON t_barbero.bar_usu_id = t_usuario.usu_id
+                        WHERE t_usuario.usu_num_doc = %s AND res_fecha = %s AND
+                        ((%s BETWEEN res_hora AND ADDTIME(res_hora, '00:30:00')) OR (res_hora BETWEEN %s AND ADDTIME(%s, '00:30:00')))""",(res_bar_num_doc,res_fecha,res_hora,res_hora,res_hora))
+        disponibilidad = cursor.fetchall()
+        if disponibilidad:
+            return jsonify({"mensaje":"Barbero No Disponible a Hora Solicitada, Intente Probar Con Otro Barbero."}), 422
         
         cursor.execute ("""
                         INSERT INTO t_reserva (res_id, res_fecha, res_hora, res_estado, res_descripcion , res_serv_id, res_bar_id, res_cli_id) 
@@ -265,7 +275,7 @@ def PUTreserva(res_id):
         res_hora  = str(request.json["res_hora"])
         res_descripcion = request.json.get("res_descripcion", "Ninguna")
 
-        time = datetime.now()
+        time = datetime.now(pytz.timezone("America/Bogota")).strftime("%Y-%m-%d %H:%M")
         if len(str(res_id).strip()) < 1 or len(str(res_fecha).strip()) < 1 or len((res_hora).strip()) < 1:
             return jsonify({"mensaje" : "faltan campos por rellenar"}), 400
         
@@ -273,9 +283,9 @@ def PUTreserva(res_id):
             res_descripcion = "Ninguna"
 
         cursor = current_app.mysql.connection.cursor()    
-        cursor.execute("SELECT * FROM t_reserva WHERE res_id = %s", (res_id,))
-        reserva = cursor.fetchone()
-        if not reserva:
+        cursor.execute("SELECT res_bar_id FROM t_reserva WHERE res_id = %s", (res_id,))
+        res_bar_id = cursor.fetchone()
+        if not res_bar_id:
             return jsonify({"mensaje" : "Uy, parece que no hay ninguna reserva con ese ID"}), 404
         
         cursor.execute("SELECT res_estado FROM t_reserva WHERE res_id = %s", (res_id,))
@@ -283,12 +293,22 @@ def PUTreserva(res_id):
         if reserva[0].lower() == "completada" or reserva[0].lower() == "cancelada":
             return jsonify({"mensaje" : "¡No se puede Reprogramar esta Reserva porque su estado no lo permite!"}), 401
         try: 
-            fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S")
+            fch = datetime.strptime(f"{res_fecha} {res_hora}", "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M")
         except ValueError:
-            return jsonify({"mensaje": f"Formato de fecha equivocado, {fch} - {time}"}), 422 
+            return jsonify({"mensaje": "Formato de fecha equivocado"}), 422 
 
         if time >= fch:
             return jsonify({"mensaje": "No puede digitar una fecha Antigua"}), 422 
+        
+        cursor.execute("""SELECT t_usuario.usu_num_doc
+                        FROM t_reserva 
+                        JOIN t_barbero ON res_bar_id = bar_id
+                        JOIN t_usuario ON t_barbero.bar_usu_id = t_usuario.usu_id
+                        WHERE res_id != %s AND (res_bar_id = %s AND res_fecha = %s AND
+                        (%s BETWEEN res_hora AND ADDTIME(res_hora, '00:30:00')) OR (res_hora BETWEEN %s AND ADDTIME(%s, '00:30:00')))""",(res_id,res_bar_id[0],res_fecha,res_hora,res_hora,res_hora))
+        disponibilidad = cursor.fetchall()
+        if disponibilidad:
+            return jsonify({"mensaje":"Barbero No Disponible a Hora Solicitada, Intente Probar Con Otra Hora."}), 422
         
         cursor.execute ("""
                         UPDATE t_reserva SET res_fecha = %s, res_hora = %s, res_estado = %s, res_descripcion  = %s WHERE res_id = %s 
@@ -362,7 +382,7 @@ def PUTreserva(res_id):
                 ha sido actualizada exitosamente.
             </p>
             <p>
-                La nueva fecha y hora de tu cita es el <strong>{res[4]}</strong> a las <strong>{res[5]}</strong>.
+                La nueva fecha y hora de tu cita es el <strong>{datetime.strptime(f"{res[4]} {res[5]}", "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y")}</strong> a las <strong>{datetime.strptime(f"{res[4]} {res[5]}", "%Y-%m-%d %H:%M:%S").strftime("%H:%M")}</strong>.
             </p>
             <p>
                 ¡Gracias por confiar en nosotros! Te estaremos esperando con mucho gusto.
@@ -370,7 +390,7 @@ def PUTreserva(res_id):
         </div>
         <hr>
         <div class="cont_inf">  
-            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+            <span>Mensaje enviado por <strong>Barber Blessed Man</strong></span>
         </div>
     </div>
 </body>
@@ -398,10 +418,10 @@ def PUTreservaestado(res_id):
             return jsonify({"mensaje" : "Debe seleccionar un estado"}), 400
         if res_estado.lower() not in ["confirmada", "cancelada", "completada", "reprogramada"]:
             return jsonify({"mensaje":"Esta digitando un valor de estado no admitido"}), 422
-        if reserva[0].lower() == "reprogramada":
+        if res_estado.lower() == "reprogramada":
             return jsonify({"mensaje" : "Para reprogramar tu reserva correctamente, debes editarla por completo"}), 401
         if reserva[0].lower() == "completada" or reserva[0].lower() == "cancelada":
-            return jsonify({"mensaje" : "¡No se puede Reprogramar esta Reserva porque su estado no lo permite!"}), 401
+            return jsonify({"mensaje" : "¡No se puede Modificar esta Reserva porque su estado no lo permite!"}), 401
         if reserva[0].lower() == res_estado.lower():
             return jsonify({"mensaje":"Esta Seleccionando el estado actual de la reserva"}), 409
         res_estado = res_estado.capitalize()
@@ -475,7 +495,7 @@ def PUTreservaestado(res_id):
         <h4>Acabas de cancelar tu reserva!</h4>
         <h6>Hola, {res[1]} {res[2]} 👋</h6>
         <div class="cont_cent">
-            <p>{res[1]}, tu reserva del servicio {res[0]} para el dia {res[4]} ha sido cancelada exitosamente.  
+            <p>{res[1]}, tu reserva del servicio {res[0]} para el dia <strong>{datetime.strptime(f"{res[4]} {res[5]}", "%Y-%m-%d %H:%M:%S").strftime("%d-%m %H:%M")}</strong> ha sido cancelada exitosamente.  
             </p>
             <p>
                 Si lo deseas, puedes programar una nueva cita en cualquier momento desde nuestra aplicación.  
@@ -484,7 +504,7 @@ def PUTreservaestado(res_id):
         </div>
         <hr>
         <div class="cont_inf">  
-            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
+            <span>Mensaje enviado por <strong>Barber Blessed Man</strong></span>
         </div>
     </div>
 </body>
@@ -493,8 +513,3 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
-
-
-
-
-
