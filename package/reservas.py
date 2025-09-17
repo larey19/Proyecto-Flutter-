@@ -2,7 +2,8 @@ from flask import Blueprint, request, jsonify, current_app
 from .auth import token
 import uuid
 from .smtp import enviar_email
-from datetime import datetime, pytz
+from datetime import datetime
+import pytz
 
 reservas_bp = Blueprint('reservas', __name__)
 
@@ -492,6 +493,7 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
 
 
 
