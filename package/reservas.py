@@ -123,7 +123,7 @@ def POSTreserva():
             return jsonify({"mensaje": "Formato de fecha equivocado"}), 422 
 
         if time >= fch:
-            return jsonify({"mensaje": "No puede digitar una fecha Antigua"}), 422 
+            return jsonify({"mensaje": f"No puede digitar una fecha Antigua {time} {fch}"}), 422 
 
         cursor = current_app.mysql.connection.cursor()       
         cursor.execute("SELECT * FROM t_servicio WHERE serv_id = %s", (res_serv_id,))
@@ -492,4 +492,5 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
 
