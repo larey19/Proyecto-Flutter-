@@ -3,6 +3,7 @@ from .auth import token
 import uuid
 from .smtp import enviar_email
 from datetime import datetime
+import pytz
 
 reservas_bp = Blueprint('reservas', __name__)
 
@@ -110,7 +111,7 @@ def POSTreserva():
         res_bar_num_doc  = request.json["res_bar_num_doc"]
         res_cli_num_doc  = request.json["res_cli_num_doc"]
         res_id = uuid.uuid4()
-        time = datetime.now().strftime("%Y-%m-%d %H:%M")
+        time = datetime.now(pytz.timezone("America/Bogota")).strftime("%Y-%m-%d %H:%M")
         if len(str(res_fecha).strip()) < 1 or len((res_hora).strip()) < 1 or len(str(res_serv_id).strip()) < 1 or len(str(res_bar_num_doc).strip()) < 1 or len(str(res_cli_num_doc).strip()) < 1:
             return jsonify({"mensaje" : "faltan campos por rellenar"}), 400
         
@@ -492,5 +493,6 @@ def PUTreservaestado(res_id):
         return jsonify({"mensaje":"El estado se ha actualizado correctamente"})
     else:
         return jsonify({"mensaje":"Faltan campos en la peticion"})
+
 
 
