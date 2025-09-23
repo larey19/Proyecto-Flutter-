@@ -198,5 +198,43 @@ def registro():
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el cliente"}),200
 
-
+@login_bp.route("/envioRecuperacion", methods = ["GET", "POST"])
+def envioRecuperacion():
+    if request.method == "POST":
+        data = request.get_json(silent=True)  
+        if data is None:
+            return jsonify({"error": "Error en la formacion del JSON"}), 400
+        if "usu_correo" in request.json:
+            usu_correo = request.json["usu_correo"]
+            cursor = current_app.mysql.connection.cursor()
+            cursor.execute("SELECT * FROM t_usuario WHERE usu_correo = %s", (usu_correo,))
+            resultado = cursor.fetchone()
+            if not resultado:
+                return jsonify({"mensaje":"Parece que ese correo no se encuentra Registrado"}), 404
+            enviar_email(usu_correo, "Restablecer Contraseña", f"""
+                        <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Test BlessedMan Deep Link</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
+        <h1>Prueba de Deep Link</h1>
+        <p>Haz clic en el enlace para abrir la pantalla de recuperar contraseña:</p>
+        
+        <a href="blessedman://recuperar_contrasena" 
+        style="display: inline-block; padding: 15px 30px; background: #1E1E2C; color: white; 
+                text-decoration: none; border-radius: 8px; font-size: 18px; margin: 20px;">
+        Ábreme
+        </a>
+        
+        <p>Si la app está instalada, se abrirá directamente en recuperar contraseña.</p>
+    </body>
+    </html>
+                        """)
+            return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
+        else:
+            return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
+        
+    else:
+        redirect("blessedman://recuperar_contrasena")
 
