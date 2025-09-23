@@ -236,6 +236,7 @@ def envioRecuperacion():
             return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
         
     else:
-        redirect("blessedman://recuperar_contrasena")
+        return redirect("blessedman://recuperar_contrasena")
+
 
 
