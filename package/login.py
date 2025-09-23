@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
 from .smtp import enviar_email
 import uuid
@@ -237,4 +237,5 @@ def envioRecuperacion():
         
     else:
         redirect("blessedman://recuperar_contrasena")
+
 
