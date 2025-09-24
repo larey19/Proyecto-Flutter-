@@ -210,13 +210,12 @@ def envioRecuperacion():
             if len(str(usu_contrasena).strip()) == 0 or len(str(usu_num_doc).strip()) == 0:
                 return jsonify({"mensaje":"No Puede Ingresar Una Contraseña vacia"}), 400
             cursor = current_app.mysql.connection.cursor()
-            cursor.execute("SELECT usu_contrasena FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
-            contrasena = cursor.fetchone()
-            if not contrasena:
-                return jsonify({"mensaje":"Parece que No hay nadie registrado con ese Documento"}), 404
-            if check_password_hash(contrasena[0], usu_contrasena):
+            cursor.execute("SELECT usu_contrasena, usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
+            usuario = cursor.fetchone()
+            if usuario[1] != usu_num_doc:
+                return jsonify({"mensaje":"Documento Equivocado"}), 404
+            if check_password_hash(usuario[0], usu_contrasena):
                 return jsonify({"mensaje": "No Puedes utilizar una Contraseña antigua"}), 404 
-            print("ok")
             usu_contrasena = generate_password_hash(request.json["usu_contrasena"])
             cursor.execute("UPDATE t_usuario SET usu_contrasena = %s WHERE usu_num_doc = %s", (usu_contrasena, usu_num_doc))
             cursor.connection.commit()
@@ -325,9 +324,10 @@ def envioRecuperacion():
 </html>
 """
 )
+            usu = usuario[0]
             return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
         else:
             return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
 
     else:
-        return redirect(f"blessed://recuperar_contrasena?num_doc={usuario[0]}")
+        return redirect(f"blessed://recuperar_contrasena")
