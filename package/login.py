@@ -227,7 +227,7 @@ def envioRecuperacion():
             if len(str(usu_correo).strip()) == 0:
                 return jsonify({"mensaje":"Debe digitar su correo"}), 400
             cursor = current_app.mysql.connection.cursor()
-            cursor.execute("SELECT usu_num_doc,usu_nombre, usu_apellido FROM t_usuario WHERE usu_correo = %s", (usu_correo,))
+            cursor.execute("SELECT usu_num_doc, usu_nombre, usu_apellido FROM t_usuario WHERE usu_correo = %s", (usu_correo,))
             usuario = cursor.fetchone()
             if not usuario:
                 return jsonify({"mensaje":"Parece que ese correo no se encuentra Registrado"}), 404
@@ -302,13 +302,13 @@ def envioRecuperacion():
         <h6>Hola, {usuario[1]} {usuario[2]}</h6>
         
         <p>
-            Hemos recibido una solicitud para restablecer tu contraseña en <strong>Barber Blessed </strong>.
+            Hemos recibido una solicitud para restablecer tu contraseña en <strong>Barber Blessed</strong>.
         </p>
         <p>
             Para continuar, haz clic en el siguiente botón. Serás redirigido a la aplicación para establecer tu nueva contraseña.
         </p>
 
-        <a href="blessed://recuperar_contrasena?num_doc={usuario[0]}" class="btn">
+        <a href="https://proyecto-flutter-yt33.onrender.com/envioRecuperacion" class="btn">
             Recuperar contraseña
         </a>
 
@@ -318,7 +318,7 @@ def envioRecuperacion():
 
         <hr>
         <div class="cont_inf">  
-            <span>Mensaje enviado por <strong>Barber Blessed Man</strong></span>
+            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
         </div>
     </div>
 </body>
@@ -328,7 +328,6 @@ def envioRecuperacion():
             return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
         else:
             return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
-        
-    else:
-        return redirect("blessedman://recuperar_contrasena")
 
+    else:
+        return redirect(f"blessed://recuperar_contrasena?num_doc={usuario[0]}")
