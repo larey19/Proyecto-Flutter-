@@ -7,7 +7,7 @@ usuarios_bp = Blueprint('usuarios', __name__)
 
 # Ruta Para Obtener todos los usuarios Registrados en la base de datos 
 @usuarios_bp.route("/obtenerUsuarios") 
-# @token
+@token
 def GETusuarios():
     cursor = current_app.mysql.connection.cursor() #Crea Variable para entablar conexion con la base de datos
     cursor.execute("SELECT * FROM t_usuario") #Realizar consulta SQL
@@ -209,3 +209,4 @@ def PUTcontrasena(usu_num_doc):
         return jsonify({"mensaje":"Se ha cambiado la contraseña correctamente"}), 200
     else:
         return jsonify({"mensaje":"Debe enviar toda la informacion"}), 400
+
