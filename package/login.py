@@ -212,7 +212,7 @@ def envioRecuperacion():
             cursor = current_app.mysql.connection.cursor()
             cursor.execute("SELECT usu_contrasena, usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
             usuario = cursor.fetchone()
-            if usuario[1] != usu_num_doc:
+            if not usu_num_doc:
                 return jsonify({"mensaje":"Documento Equivocado"}), 404
             if check_password_hash(usuario[0], usu_contrasena):
                 return jsonify({"mensaje": "No Puedes utilizar una Contraseña antigua"}), 404 
@@ -330,4 +330,5 @@ def envioRecuperacion():
 
     else:
         return redirect(f"blessedman://recuperar_contrasena")
+
 
