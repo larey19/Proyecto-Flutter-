@@ -184,6 +184,7 @@ def PUTusuario(usu_num_doc):
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha editado el Usuario"}), 200
 
+
 @usuarios_bp.route("/editarContrasena/<usu_num_doc>", methods=["PUT"])
 @token
 def PUTcontrasena(usu_num_doc):
@@ -198,7 +199,7 @@ def PUTcontrasena(usu_num_doc):
         usu_contrasena_old = cursor.fetchone()
         if not usu_contrasena_old: 
             return jsonify({"mensaje" : "Parece que intentas actualizar un registro que NO existe"}), 404
-        if len(str(usu_contrasena).strip()) == 0:
+        if len(str(usu_contrasena).strip()) == 0 or len(str(usu_contrasena_new).strip()):
             return jsonify({"mensaje":"no debe enviar informacion vacia"}), 404
         if not check_password_hash(usu_contrasena_old[0],usu_contrasena):
             return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
