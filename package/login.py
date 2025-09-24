@@ -198,137 +198,137 @@ def registro():
     cursor.connection.commit()
     return jsonify({"mensaje":"Se ha registrado el cliente"}),200
 
-@login_bp.route("/envioRecuperacion", methods = ["GET", "POST"])
+@login_bp.route("/envioRecuperacion", methods = ["POST"])
 def envioRecuperacion():
-    if request.method == "POST":
-        data = request.get_json(silent=True)  
-        if data is None:
-            return jsonify({"error": "Error en la formacion del JSON"}), 400
-        if "usu_contrasena" in request.json and "usu_num_doc" in request.json:
-            usu_num_doc = request.json["usu_num_doc"]
-            usu_contrasena = request.json["usu_contrasena"]
-            if len(str(usu_contrasena).strip()) == 0 or len(str(usu_num_doc).strip()) == 0:
-                return jsonify({"mensaje":"No Puede Ingresar Una Contraseña vacia"}), 400
-            cursor = current_app.mysql.connection.cursor()
-            cursor.execute("SELECT usu_contrasena, usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
-            usuario = cursor.fetchone()
-            if not usu_num_doc:
-                return jsonify({"mensaje":"Documento Equivocado"}), 404
-            if check_password_hash(usuario[0], usu_contrasena):
-                return jsonify({"mensaje": "No Puedes utilizar una Contraseña antigua"}), 404 
-            usu_contrasena = generate_password_hash(request.json["usu_contrasena"])
-            cursor.execute("UPDATE t_usuario SET usu_contrasena = %s WHERE usu_num_doc = %s", (usu_contrasena, usu_num_doc))
-            cursor.connection.commit()
-            return jsonify({"mensaje":"Se ha cambiado la contraseña correctamente"}), 200
-        
-        elif "usu_correo" in request.json:
-            usu_correo = request.json["usu_correo"]
-            if len(str(usu_correo).strip()) == 0:
-                return jsonify({"mensaje":"Debe digitar su correo"}), 400
-            cursor = current_app.mysql.connection.cursor()
-            cursor.execute("SELECT usu_num_doc, usu_nombre, usu_apellido FROM t_usuario WHERE usu_correo = %s", (usu_correo,))
-            usuario = cursor.fetchone()
-            if not usuario:
-                return jsonify({"mensaje":"Parece que ese correo no se encuentra Registrado"}), 404
-            enviar_email(usu_correo, "Restablecer Contraseña", f"""
+    data = request.get_json(silent=True)  
+    if data is None:
+        return jsonify({"error": "Error en la formacion del JSON"}), 400
+    if "usu_contrasena" in request.json and "usu_num_doc" in request.json:
+        usu_num_doc = request.json["usu_num_doc"]
+        usu_contrasena = request.json["usu_contrasena"]
+        if len(str(usu_contrasena).strip()) == 0 or len(str(usu_num_doc).strip()) == 0:
+            return jsonify({"mensaje":"No Puede Ingresar Una Contraseña vacia"}), 400
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT usu_contrasena, usu_num_doc FROM t_usuario WHERE usu_num_doc = %s", (usu_num_doc,))
+        usuario = cursor.fetchone()
+        if not usuario:
+            return jsonify({"mensaje":"Documento Equivocado"}), 404
+        if check_password_hash(usuario[0], usu_contrasena):
+            return jsonify({"mensaje": "No Puedes utilizar una Contraseña antigua"}), 404 
+        usu_contrasena = generate_password_hash(request.json["usu_contrasena"])
+        cursor.execute("UPDATE t_usuario SET usu_contrasena = %s WHERE usu_num_doc = %s", (usu_contrasena, usu_num_doc))
+        cursor.connection.commit()
+        return jsonify({"mensaje":"Se ha cambiado la contraseña correctamente"}), 200
+    
+    elif "usu_correo" in request.json:
+        usu_correo = request.json["usu_correo"]
+        if len(str(usu_correo).strip()) == 0:
+            return jsonify({"mensaje":"Debe digitar su correo"}), 400
+        cursor = current_app.mysql.connection.cursor()
+        cursor.execute("SELECT usu_num_doc, usu_nombre, usu_apellido FROM t_usuario WHERE usu_correo = %s", (usu_correo,))
+        usuario = cursor.fetchone()
+        if not usuario:
+            return jsonify({"mensaje":"Parece que ese correo no se encuentra Registrado"}), 404
+        enviar_email(usu_correo, "Restablecer Contraseña", f"""
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar contraseña</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
-        * {{
-            font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
-        }}
-        body {{
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f9;
-        }}
-        .email {{
-            margin: auto;
-            max-width: 550px;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }}
-        h2 {{
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }}
-        h6 {{
-            margin: 0px auto 15px;
-            color: #555;
-        }}
-        p {{
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.5;
-        }}
-        .btn {{
-            display: inline-block;
-            padding: 14px 28px;
-            background: #1E1E2C;
-            color: #ffffff !important;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 25px 0;
-        }}
-        .cont_inf {{
-            font-size: 0.75rem;
-            text-align: center;
-            color: #777;
-            margin-top: 20px;
-        }}
-        hr {{
-            border: none;
-            border-top: 1px solid #eee;
-            margin: 25px 0;
-        }}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperar contraseña</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+    * {{
+        font-family: 'Montserrat', Arial, Helvetica, sans-serif !important;
+    }}
+    body {{
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f9;
+    }}
+    .email {{
+        margin: auto;
+        max-width: 550px;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }}
+    h2 {{
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }}
+    h6 {{
+        margin: 0px auto 15px;
+        color: #555;
+    }}
+    p {{
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.5;
+    }}
+    .btn {{
+        display: inline-block;
+        padding: 14px 28px;
+        background: #1E1E2C;
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 25px 0;
+    }}
+    .cont_inf {{
+        font-size: 0.75rem;
+        text-align: center;
+        color: #777;
+        margin-top: 20px;
+    }}
+    hr {{
+        border: none;
+        border-top: 1px solid #eee;
+        margin: 25px 0;
+    }}
+</style>
 </head>
 
 <body>
-    <div class="email">
-        <h2>Recupera tu contraseña</h2>
-        <h6>Hola, {usuario[1]} {usuario[2]}</h6>
-        
-        <p>
-            Hemos recibido una solicitud para restablecer tu contraseña en <strong>Barber Blessed</strong>.
-        </p>
-        <p>
-            Para continuar, haz clic en el siguiente botón. Serás redirigido a la aplicación para establecer tu nueva contraseña.
-        </p>
+<div class="email">
+    <h2>Recupera tu contraseña</h2>
+    <h6>Hola, {usuario[1]} {usuario[2]}</h6>
+    
+    <p>
+        Hemos recibido una solicitud para restablecer tu contraseña en <strong>Barber Blessed</strong>.
+    </p>
+    <p>
+        Para continuar, haz clic en el siguiente botón. Serás redirigido a la aplicación para establecer tu nueva contraseña.
+    </p>
 
-        <a href="https://proyecto-flutter-yt33.onrender.com/envioRecuperacion" class="btn">
-            Recuperar contraseña
-        </a>
+    <a href="https://proyecto-flutter-yt33.onrender.com/recuperacion/{usuario[0]}" class="btn">
+        Recuperar contraseña
+    </a>
 
-        <p>
-            Si no realizaste esta solicitud, puedes ignorar este mensaje. Tu cuenta seguirá segura.
-        </p>
+    <p>
+        Si no realizaste esta solicitud, puedes ignorar este mensaje. Tu cuenta seguirá segura.
+    </p>
 
-        <hr>
-        <div class="cont_inf">  
-            <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
-        </div>
+    <hr>
+    <div class="cont_inf">  
+        <span>Mensaje enviado por <strong>Barber Blessed</strong></span>
     </div>
+</div>
 </body>
 </html>
 """
 )
-            return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
-        else:
-            return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
-
+        usu = usuario[0]
+        return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
     else:
-        return redirect(f"blessedman://recuperar_contrasena")
-
-
+        return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
+    
+@login_bp.route("/recuperacion/<usu_num_doc>")
+def recuperar(usu_num_doc):
+    return redirect(f"blessedman://recuperar_contrasena?usu_num_doc={usu_num_doc}")
+    
