@@ -324,10 +324,10 @@ def envioRecuperacion():
 </html>
 """
 )
-            usu = usuario[0]
             return jsonify({"mensaje" : "Siga los pasos Enviados a su Correo"}),200
         else:
             return jsonify({"mensaje" : "Error faltan el correo en la peticion"}), 404
 
     else:
-        return redirect(f"blessed://recuperar_contrasena")
+        return redirect(f"blessedman://recuperar_contrasena")
+
