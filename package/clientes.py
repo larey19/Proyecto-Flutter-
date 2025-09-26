@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from .auth import token
 import uuid
-from .smtp import enviar_email
+from .brevo import enviar_email
 clientes_bp = Blueprint('clientes', __name__)
 
 # Ruta Para Obtener todos los clientes Registrados en la base de datos 
@@ -117,3 +117,4 @@ def POSTcliente():
         return jsonify({"mensaje":"Se ha registrado el cliente"}),200
     else:
         return jsonify({"mensaje" : "Debe digitar el ID del usuario que sera cliente"}), 404
+
