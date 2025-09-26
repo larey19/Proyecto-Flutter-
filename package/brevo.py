@@ -11,13 +11,9 @@ def enviar_email(destinatario, asunto, mensaje):
         "content-type": "application/json"
     }
     data = {
-        "sender": {"name": "Barber Blessed", "email": "barberblessedman@gmail.com"},
+        "sender": {"name": "Blessed Man", "email": "barberblessedman@gmail.com"},
         "to": [{"email": destinatario}],
         "subject": asunto,
         "htmlContent": mensaje
     }
     response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 201:
-        print(f"Correo enviado a {destinatario}")
-    else:
-        print("Error al enviar:", response.text)
