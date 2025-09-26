@@ -1,11 +1,14 @@
 from flask import Blueprint, jsonify, request, current_app, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
+from dotenv import load_dotenv
 from .brevo import enviar_email
 import uuid
 import jwt
 
+import os 
+load_dotenv()
+JWT_KEY = os.getenv("JWT_KEY")
 login_bp = Blueprint('login', __name__)
-
 
 @login_bp.route("/acceso", methods=["POST"])
 def login_flutter():
@@ -35,7 +38,7 @@ def login_flutter():
                 return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
             token = jwt.encode({
                 'usuario_id': admin[0]
-            }, current_app.config['SECRET_KEY'], algorithm='HS256')
+            }, JWT_KEY, algorithm='HS256')
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {admin[1]}",
                 "token": token, 
@@ -47,7 +50,7 @@ def login_flutter():
                 return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
             token = jwt.encode({
                 'usuario_id': barber[0]
-            }, current_app.config['SECRET_KEY'], algorithm='HS256')
+            }, JWT_KEY, algorithm='HS256')
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {barber[1]}",
                 "token": token,
@@ -59,7 +62,7 @@ def login_flutter():
                 return jsonify({"mensaje": "Ups, esa contraseña parece estar incorrecta"}), 404 
             token = jwt.encode({
                 'usuario_id': user[0]
-            }, current_app.config['SECRET_KEY'], algorithm='HS256')
+            }, JWT_KEY, algorithm='HS256')
             return jsonify({
                 "mensaje": f"Sesión iniciada con éxito {user[1]}",
                 "token": token,
@@ -332,4 +335,5 @@ def envioRecuperacion():
 def recuperar(usu_num_doc):
     return redirect(f"blessedman://recuperar_contrasena?usu_num_doc={usu_num_doc}")
     
+
 
