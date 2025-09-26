@@ -1,5 +1,7 @@
 import os
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 BREVO_KEY = os.getenv("BREVO_KEY")
 
@@ -11,9 +13,13 @@ def enviar_email(destinatario, asunto, mensaje):
         "content-type": "application/json"
     }
     data = {
-        "sender": {"name": "Blessed Man", "email": "barberblessedman@gmail.com"},
+        "sender": {"name": "Barber Blessed", "email": "barberblessedman@gmail.com"},
         "to": [{"email": destinatario}],
         "subject": asunto,
         "htmlContent": mensaje
     }
     response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 201:
+        print(f"Correo enviado a {destinatario}")
+    else:
+        print("Error al enviar:", response.text)
